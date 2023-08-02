@@ -30,6 +30,8 @@ code_linter:
 
 push_to_github:
   stage: push_to_github
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "develop"'
   image: ubuntu:latest
   before_script:
     - apt-get update
