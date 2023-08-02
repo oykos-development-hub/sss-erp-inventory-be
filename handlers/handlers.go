@@ -1,11 +1,15 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Handlers struct {
-	RealEstateHandler RealEstateHandler
-	ItemHandler       ItemHandler
-	AssessmentHandler AssessmentHandler
+	RealEstateHandler   RealEstateHandler
+	ItemHandler         ItemHandler
+	AssessmentHandler   AssessmentHandler
+	DispatchHandler     DispatchHandler
+	DispatchItemHandler DispatchItemHandler
 }
 
 type RealEstateHandler interface {
@@ -32,4 +36,19 @@ type AssessmentHandler interface {
 	GetAssessmentById(w http.ResponseWriter, r *http.Request)
 	GetAssessmentList(w http.ResponseWriter, r *http.Request)
 	GetAssessmentbyItemId(w http.ResponseWriter, r *http.Request)
+}
+
+type DispatchHandler interface {
+	CreateDispatch(w http.ResponseWriter, r *http.Request)
+	UpdateDispatch(w http.ResponseWriter, r *http.Request)
+	DeleteDispatch(w http.ResponseWriter, r *http.Request)
+	GetDispatchById(w http.ResponseWriter, r *http.Request)
+	GetDispatchList(w http.ResponseWriter, r *http.Request)
+}
+
+type DispatchItemHandler interface {
+	CreateDispatchItem(w http.ResponseWriter, r *http.Request)
+	UpdateDispatchItem(w http.ResponseWriter, r *http.Request)
+	DeleteDispatchItem(w http.ResponseWriter, r *http.Request)
+	GetDispatchItemListByItemId(w http.ResponseWriter, r *http.Request)
 }

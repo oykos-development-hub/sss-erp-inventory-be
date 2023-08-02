@@ -35,13 +35,21 @@ func initApplication() *celeritas.Celeritas {
 	ItemService := services.NewItemServiceImpl(cel, models.Item)
 	ItemHandler := handlers.NewItemHandler(cel, ItemService)
 
+	DispatchService := services.NewDispatchServiceImpl(cel, models.Dispatch)
+	DispatchHandler := handlers.NewDispatchHandler(cel, DispatchService)
+
+	DispatchItemService := services.NewDispatchItemServiceImpl(cel, models.DispatchItem)
+	DispatchItemHandler := handlers.NewDispatchItemHandler(cel, DispatchItemService)
+
 	AssessmentService := services.NewAssessmentServiceImpl(cel, models.Assessment)
 	AssessmentHandler := handlers.NewAssessmentHandler(cel, AssessmentService)
 
 	myHandlers := &handlers.Handlers{
-		RealEstateHandler: RealEstateHandler,
-		ItemHandler:       ItemHandler,
-		AssessmentHandler: AssessmentHandler,
+		RealEstateHandler:   RealEstateHandler,
+		ItemHandler:         ItemHandler,
+		AssessmentHandler:   AssessmentHandler,
+		DispatchHandler:     DispatchHandler,
+		DispatchItemHandler: DispatchItemHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

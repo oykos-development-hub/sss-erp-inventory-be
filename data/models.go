@@ -23,7 +23,9 @@ type Models struct {
 	RealEstate RealEstate
 	Item       Item
 	Assessment Assessment
-}
+	Dispatch   Dispatch
+	DispatchItem DispatchItem
+	}
 
 func New(databasePool *sql.DB) Models {
 	db = databasePool
@@ -41,6 +43,8 @@ func New(databasePool *sql.DB) Models {
 		RealEstate: RealEstate{},
 		Item:       Item{},
 		Assessment: Assessment{},
+		Dispatch:   Dispatch{},
+		DispatchItem: DispatchItem{},
 	}
 }
 

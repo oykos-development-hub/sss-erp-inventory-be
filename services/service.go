@@ -35,3 +35,18 @@ type AssessmentService interface {
 	GetAssessmentList() ([]dto.AssessmentResponseDTO, error)
 	GetAssessmentbyItemId(id int) (*dto.AssessmentResponseDTO, error)
 }
+
+type DispatchService interface {
+	CreateDispatch(input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
+	UpdateDispatch(id int, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
+	DeleteDispatch(id int) error
+	GetDispatch(id int) (*dto.DispatchResponseDTO, error)
+	GetDispatchList(input *dto.GetDispatchListInput) ([]dto.DispatchResponseDTO, *uint64, error)
+}
+
+type DispatchItemService interface {
+	CreateDispatchItem(input dto.DispatchItemDTO) (*dto.DispatchItemResponseDTO, error)
+	UpdateDispatchItem(id int, input dto.DispatchItemDTO) (*dto.DispatchItemResponseDTO, error)
+	DeleteDispatchItem(id int) error
+	GetDispatchItemList(id int) ([]dto.DispatchItemResponseDTO, error)
+}
