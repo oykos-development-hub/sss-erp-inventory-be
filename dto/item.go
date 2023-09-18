@@ -33,7 +33,7 @@ type ItemDTO struct {
 	DonorTitle                   *string    `json:"donor_title"`
 	InvoiceNumber                *string    `json:"invoice_number"`
 	Active                       bool       `json:"active"`
-	DeactivationDescription      string     `json:"deactivation_description"`
+	DeactivationDescription      *string    `json:"deactivation_description"`
 	InvoiceFileID                *int       `json:"invoice_file_id"`
 	FileID                       *int       `json:"file_id"`
 	DateOfAssessment             *time.Time `json:"date_of_assessment"`
@@ -69,7 +69,7 @@ type ItemResponseDTO struct {
 	DonorTitle                   *string    `json:"donor_title"`
 	InvoiceNumber                *string    `json:"invoice_number"`
 	Active                       bool       `json:"active"`
-	DeactivationDescription      string     `json:"deactivation_description"`
+	DeactivationDescription      *string    `json:"deactivation_description"`
 	DateOfAssessment             *time.Time `json:"date_of_assessment"`
 	PriceOfAssessment            *int       `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int       `json:"lifetime_of_assessment_in_months"`

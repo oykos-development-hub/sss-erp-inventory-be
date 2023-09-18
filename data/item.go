@@ -35,7 +35,7 @@ type Item struct {
 	DonorTitle                   *string    `db:"donor_title"`
 	InvoiceNumber                *string    `db:"invoice_number"`
 	Active                       bool       `db:"active"`
-	DeactivationDescription      string     `db:"deactivation_description"`
+	DeactivationDescription      *string     `db:"deactivation_description"`
 	DateOfAssessment             *time.Time `db:"date_of_assessment"`
 	PriceOfAssessment            *int       `db:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int       `db:"lifetime_of_assessment_in_months"`
