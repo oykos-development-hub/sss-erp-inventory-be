@@ -8,8 +8,8 @@ import (
 	"gitlab.sudovi.me/erp/inventory-api/errors"
 	"gitlab.sudovi.me/erp/inventory-api/services"
 
-	"github.com/oykos-development-hub/celeritas"
 	"github.com/go-chi/chi/v5"
+	"github.com/oykos-development-hub/celeritas"
 )
 
 // AssessmentHandler is a concrete type that implements AssessmentHandler
@@ -111,11 +111,11 @@ func (h *assessmentHandlerImpl) GetAssessmentList(w http.ResponseWriter, r *http
 func (h *assessmentHandlerImpl) GetAssessmentbyItemId(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
-	res, err := h.service.GetAssessmentbyItemId(id)
+	res, total, err := h.service.GetAssessmentbyItemId(id)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
-	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }

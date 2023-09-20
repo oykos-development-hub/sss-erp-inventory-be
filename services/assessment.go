@@ -90,22 +90,22 @@ func (h *AssessmentServiceImpl) GetAssessmentList() ([]dto.AssessmentResponseDTO
 	return response, nil
 }
 
-func (h *AssessmentServiceImpl) GetAssessmentbyItemId(id int) (*dto.AssessmentResponseDTO, error) {
+func (h *AssessmentServiceImpl) GetAssessmentbyItemId(id int) ([]dto.AssessmentResponseDTO, *uint64, error) {
 	cond := up.Cond{
 		"inventory_id": id,
 	}
 
-	data, _, err := h.repo.GetAll(nil, nil, &cond)
+	data, total, err := h.repo.GetAll(nil, nil, &cond)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
-	}
-	response := dto.AssessmentResponseDTO{}
-
-	if len(data) != 0 {
-		response = dto.ToAssessmentResponseDTO(*data[0])
-		return &response, nil
+		return nil, nil, errors.ErrNotFound
 	}
 
-	return nil, nil
+	if len(data) == 0 {
+		//response = dto.ToAssessmentResponseDTO(*data[0])
+		return nil, nil, errors.ErrNotFound
+	}
+
+	response := dto.ToAssessmentListResponseDTO(data)
+	return response, total, nil
 }

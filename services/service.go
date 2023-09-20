@@ -33,7 +33,7 @@ type AssessmentService interface {
 	DeleteAssessment(id int) error
 	GetAssessment(id int) (*dto.AssessmentResponseDTO, error)
 	GetAssessmentList() ([]dto.AssessmentResponseDTO, error)
-	GetAssessmentbyItemId(id int) (*dto.AssessmentResponseDTO, error)
+	GetAssessmentbyItemId(id int) ([]dto.AssessmentResponseDTO, *uint64, error)
 }
 
 type DispatchService interface {
