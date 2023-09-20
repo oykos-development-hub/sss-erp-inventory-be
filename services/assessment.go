@@ -80,7 +80,7 @@ func (h *AssessmentServiceImpl) GetAssessment(id int) (*dto.AssessmentResponseDT
 }
 
 func (h *AssessmentServiceImpl) GetAssessmentList() ([]dto.AssessmentResponseDTO, error) {
-	data, _, err := h.repo.GetAll(nil,nil,nil)
+	data, _, err := h.repo.GetAll(nil, nil, nil)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrInternalServer
@@ -94,8 +94,8 @@ func (h *AssessmentServiceImpl) GetAssessmentbyItemId(id int) (*dto.AssessmentRe
 	cond := up.Cond{
 		"inventory_id": id,
 	}
-	curr := 1
-	data, _, err := h.repo.GetAll(&curr, &curr, &cond)
+
+	data, _, err := h.repo.GetAll(nil, nil, &cond)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, errors.ErrNotFound
