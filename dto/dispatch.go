@@ -13,9 +13,11 @@ type GetDispatchListInput struct {
 	Type                     *string `json:"string"`
 	SourceOrganizationUnitID *int    `json:"source_organization_unit_id"`
 	Accepted                 *bool   `json:"accepted"`
+	InventoryType            *string `json:"inventory_type"`
 }
 
 type DispatchDTO struct {
+	InventoryType            string  `json:"inventory_type"`
 	Type                     string  `json:"type"`
 	SourceUserProfileID      int     `json:"source_user_profile_id"`
 	TargetUserProfileID      *int    `json:"target_user_profile_id"`
@@ -30,6 +32,7 @@ type DispatchDTO struct {
 
 type DispatchResponseDTO struct {
 	ID                       int       `json:"id"`
+	InventoryType            string    `json:"inventory_type"`
 	Type                     string    `json:"type"`
 	SourceUserProfileID      int       `json:"source_user_profile_id"`
 	TargetUserProfileID      *int      `json:"target_user_profile_id"`
@@ -47,6 +50,7 @@ type DispatchResponseDTO struct {
 func (dto DispatchDTO) ToDispatch() *data.Dispatch {
 	return &data.Dispatch{
 		Type:                     dto.Type,
+		InventoryType:            dto.InventoryType,
 		SourceUserProfileID:      dto.SourceUserProfileID,
 		TargetUserProfileID:      dto.TargetUserProfileID,
 		SourceOrganizationUnitID: dto.SourceOrganizationUnitID,
@@ -63,6 +67,7 @@ func ToDispatchResponseDTO(data data.Dispatch) DispatchResponseDTO {
 	return DispatchResponseDTO{
 		ID:                       data.ID,
 		Type:                     data.Type,
+		InventoryType:            data.InventoryType,
 		SourceUserProfileID:      data.SourceUserProfileID,
 		TargetUserProfileID:      data.TargetUserProfileID,
 		SourceOrganizationUnitID: data.SourceOrganizationUnitID,

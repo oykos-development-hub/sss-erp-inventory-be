@@ -10,6 +10,7 @@ import (
 type Dispatch struct {
 	ID                       int       `db:"id,omitempty"`
 	Type                     string    `db:"type"`
+	InventoryType            string    `db:"inventory_type"`
 	SourceUserProfileID      int       `db:"source_user_profile_id"`
 	TargetUserProfileID      *int      `db:"target_user_profile_id"`
 	SourceOrganizationUnitID int       `db:"source_organization_unit_id"`

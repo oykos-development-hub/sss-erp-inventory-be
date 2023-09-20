@@ -80,6 +80,7 @@ func (h *DispatchServiceImpl) GetDispatch(id int) (*dto.DispatchResponseDTO, err
 }
 
 func (h *DispatchServiceImpl) GetDispatchList(input *dto.GetDispatchListInput) ([]dto.DispatchResponseDTO, *uint64, error) {
+
 	conditionAndExp := &up.AndExpr{}
 
 	if input.Id != nil {
@@ -96,6 +97,10 @@ func (h *DispatchServiceImpl) GetDispatchList(input *dto.GetDispatchListInput) (
 
 	if input.Accepted != nil {
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"is_accepted": *input.Accepted})
+	}
+
+	if input.InventoryType != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"inventory_type": *input.InventoryType})
 	}
 
 	data, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
