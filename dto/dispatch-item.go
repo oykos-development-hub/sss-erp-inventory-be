@@ -9,6 +9,10 @@ type DispatchItemDTO struct {
 	DispatchId  int `json:"dispatch_id"`
 }
 
+type DispatchItemStatus struct {
+	Type string `json:"type"`
+}
+
 type DispatchItemResponseDTO struct {
 	ID          int `json:"id"`
 	InventoryId int `json:"inventory_id"`

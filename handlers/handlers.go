@@ -51,4 +51,5 @@ type DispatchItemHandler interface {
 	UpdateDispatchItem(w http.ResponseWriter, r *http.Request)
 	DeleteDispatchItem(w http.ResponseWriter, r *http.Request)
 	GetDispatchItemListByItemId(w http.ResponseWriter, r *http.Request)
+	GetDispatchItemListByStatus(w http.ResponseWriter, r *http.Request)
 }

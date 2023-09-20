@@ -31,6 +31,31 @@ func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
 	return all, err
 }
 
+func (t *DispatchItem) GetAllInv(status string) ([]*DispatchItem, error) {
+	var all []*DispatchItem
+
+	query := `SELECT d.id, d.inventory_id, d.dispatch_id
+			FROM items i, dispatch_items d 
+			WHERE i.id = d.inventory_id and i.type = $1`
+
+	rows, err := upper.SQL().Query(query, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item DispatchItem
+		err = rows.Scan(&item.ID, &item.InventoryId, &item.DispatchId)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, &item)
+	}
+
+	return all, nil
+}
+
 // Get gets one record from the database, by id, using upper
 func (t *DispatchItem) Get(id int) (*DispatchItem, error) {
 	var one DispatchItem

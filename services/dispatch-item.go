@@ -77,3 +77,14 @@ func (h *DispatchItemServiceImpl) GetDispatchItemList(id int) ([]dto.DispatchIte
 
 	return response, nil
 }
+
+func (h *DispatchItemServiceImpl) GetDispatchItemListbyStatus(Type string) ([]dto.DispatchItemResponseDTO, error) {
+	data, err := h.repo.GetAllInv(Type)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+	response := dto.ToDispatchItemListResponseDTO(data)
+
+	return response, nil
+}

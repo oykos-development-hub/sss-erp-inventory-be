@@ -97,3 +97,26 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByItemId(w http.ResponseWri
 
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
+
+func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWriter, r *http.Request) {
+	var input dto.DispatchItemStatus
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetDispatchItemListbyStatus(input.Type)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "DispatchItem fetch successfuly", res)
+}

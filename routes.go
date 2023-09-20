@@ -44,6 +44,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Put("/dispatch-items/{id}", handlers.DispatchItemHandler.UpdateDispatchItem)
 		rt.Delete("/dispatch-items/{id}", handlers.DispatchItemHandler.DeleteDispatchItem)
 		rt.Get("/item/{id}/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByItemId)
+		rt.Get("/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByStatus)
 	})
 
 	return app.Routes

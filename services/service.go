@@ -49,4 +49,5 @@ type DispatchItemService interface {
 	UpdateDispatchItem(id int, input dto.DispatchItemDTO) (*dto.DispatchItemResponseDTO, error)
 	DeleteDispatchItem(id int) error
 	GetDispatchItemList(id int) ([]dto.DispatchItemResponseDTO, error)
+	GetDispatchItemListbyStatus(Type string) ([]dto.DispatchItemResponseDTO, error)
 }
