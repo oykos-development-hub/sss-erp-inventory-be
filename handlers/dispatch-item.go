@@ -112,7 +112,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWri
 		return
 	}
 
-	res, err := h.service.GetDispatchItemListbyStatus(input.Type)
+	res, err := h.service.GetDispatchItemListbyStatus(input.Type, input.DispatchID)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

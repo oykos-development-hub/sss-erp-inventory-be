@@ -31,26 +31,39 @@ func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
 	return all, err
 }
 
-func (t *DispatchItem) GetAllInv(status string) ([]*DispatchItem, error) {
+func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem, error) {
 	var all []*DispatchItem
 
-	query := `SELECT d.id, d.inventory_id, d.dispatch_id
+	if status != nil {
+		query := `SELECT d.id, d.inventory_id, d.dispatch_id
 			FROM items i, dispatch_items d 
 			WHERE i.id = d.inventory_id and i.type = $1`
 
-	rows, err := upper.SQL().Query(query, status)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var item DispatchItem
-		err = rows.Scan(&item.ID, &item.InventoryId, &item.DispatchId)
+		rows, err := upper.SQL().Query(query, status)
 		if err != nil {
 			return nil, err
 		}
-		all = append(all, &item)
+		defer rows.Close()
+
+		for rows.Next() {
+			var item DispatchItem
+			err = rows.Scan(&item.ID, &item.InventoryId, &item.DispatchId)
+			if err != nil {
+				return nil, err
+			}
+			all = append(all, &item)
+		}
+	} else if dispatch != nil {
+		var res up.Result
+		collection := upper.Collection(t.Table())
+		res = collection.Find(up.Cond{"dispatch_id": &dispatch})
+
+		err := res.All(&all)
+		if err != nil {
+			return nil, err
+		}
+
+		return all, nil
 	}
 
 	return all, nil
