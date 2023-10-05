@@ -106,7 +106,7 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 	}
 
 	if filter.DeprecationTypeID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"deprecation_type_id": *filter.DeprecationTypeID})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"depreciation_type_id": *filter.DeprecationTypeID})
 	}
 
 	if filter.OrganizationUnitID != nil {
