@@ -3,18 +3,18 @@ version: '3'
 services:
 
 #  start Postgres, and ensure that data is stored to a mounted volume
-  postgres:
-    image: 'postgres:13.4'
-    ports:
-      - "5435:5432"
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: inventory
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/data/postgres
+  # postgres:
+  #   image: 'postgres:13.4'
+  #   ports:
+  #     - "5435:5432"
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: inventory
+  #     PGDATA: /data/postgres
+  #   volumes:
+  #     - postgres:/data/postgres
 
   #  start Redis, and ensure that data is stored to a mounted volume
   redis:
@@ -26,19 +26,19 @@ services:
       - ./db-data/redis/:/data
 
   #  start MariaDB, and ensure that data is stored to a mounted volume
-  mariadb:
-    image: 'mariadb:10.6'
-    ports:
-      - "3308:3306"
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: celeritas
-      MYSQL_USER: mariadb
-      MYSQL_PASSWORD: password
+  # mariadb:
+  #   image: 'mariadb:10.6'
+  #   ports:
+  #     - "3308:3306"
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: password
+  #     MYSQL_DATABASE: celeritas
+  #     MYSQL_USER: mariadb
+  #     MYSQL_PASSWORD: password
 
-    volumes:
-      - ./db-data/mariadb:/docker-entrypoint-initdb.d
+  #   volumes:
+  #     - ./db-data/mariadb:/docker-entrypoint-initdb.d
 
 volumes:
   postgres:
