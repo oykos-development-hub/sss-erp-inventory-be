@@ -7,6 +7,7 @@ CREATE TABLE assessments (
     gross_price_new INTEGER NOT NULL,
     gross_price_difference INTEGER NOT NULL,
     date_of_assessment DATE,
+    type_value TEXT NOT NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     file_id INTEGER

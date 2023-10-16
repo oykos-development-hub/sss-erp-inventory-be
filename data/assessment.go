@@ -18,6 +18,7 @@ type Assessment struct {
 	DateOfAssessment     *time.Time `db:"date_of_assessment"`
 	CreatedAt            time.Time  `db:"created_at,omitempty"`
 	UpdatedAt            time.Time  `db:"updated_at"`
+	Type                 string     `db:"type_value"`
 	FileID               *int       `db:"file_id"`
 }
 

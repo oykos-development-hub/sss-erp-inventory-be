@@ -7,28 +7,30 @@ import (
 )
 
 type AssessmentDTO struct {
-	InventoryID          int       `json:"inventory_id"`
-	Active               bool      `json:"active"`
-	DepreciationTypeID   int       `json:"depreciation_type_id"`
+	InventoryID          int        `json:"inventory_id"`
+	Active               bool       `json:"active"`
+	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
-	GrossPriceNew        int       `json:"gross_price_new"`
-	GrossPriceDifference int       `json:"gross_price_difference"`
+	GrossPriceNew        int        `json:"gross_price_new"`
+	GrossPriceDifference int        `json:"gross_price_difference"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
 	FileID               *int       `json:"file_id,omitempty"`
+	Type                 string     `json:"type"`
 }
 
 type AssessmentResponseDTO struct {
-	ID                   int       `json:"id"`
-	InventoryID          int       `json:"inventory_id"`
-	Active               bool      `json:"active"`
-	DepreciationTypeID   int       `json:"depreciation_type_id"`
+	ID                   int        `json:"id"`
+	InventoryID          int        `json:"inventory_id"`
+	Active               bool       `json:"active"`
+	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
-	GrossPriceNew        int       `json:"gross_price_new"`
-	GrossPriceDifference int       `json:"gross_price_difference"`
+	GrossPriceNew        int        `json:"gross_price_new"`
+	GrossPriceDifference int        `json:"gross_price_difference"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
-	CreatedAt            time.Time `json:"created_at"`
-	UpdatedAt            time.Time `json:"updated_at,omitempty"`
+	CreatedAt            time.Time  `json:"created_at"`
+	UpdatedAt            time.Time  `json:"updated_at,omitempty"`
 	FileID               *int       `json:"file_id,omitempty"`
+	Type                 string     `json:"type"`
 }
 
 func (dto AssessmentDTO) ToAssessment() *data.Assessment {
@@ -41,6 +43,7 @@ func (dto AssessmentDTO) ToAssessment() *data.Assessment {
 		GrossPriceDifference: dto.GrossPriceDifference,
 		DateOfAssessment:     dto.DateOfAssessment,
 		FileID:               dto.FileID,
+		Type:                 dto.Type,
 	}
 }
 
@@ -57,6 +60,7 @@ func ToAssessmentResponseDTO(data data.Assessment) AssessmentResponseDTO {
 		CreatedAt:            data.CreatedAt,
 		UpdatedAt:            data.UpdatedAt,
 		FileID:               data.FileID,
+		Type:                 data.Type,
 	}
 }
 
@@ -67,4 +71,3 @@ func ToAssessmentListResponseDTO(assessments []*data.Assessment) []AssessmentRes
 	}
 	return dtoList
 }
-
