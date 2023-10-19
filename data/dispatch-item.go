@@ -23,7 +23,7 @@ func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
 
 	res := collection.Find(up.Cond{"inventory_id": id})
 
-	err := res.All(&all)
+	err := res.OrderBy("id desc").All(&all)
 	if err != nil {
 		return nil, err
 	}
