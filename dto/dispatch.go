@@ -17,34 +17,36 @@ type GetDispatchListInput struct {
 }
 
 type DispatchDTO struct {
-	InventoryType            string  `json:"inventory_type"`
-	Type                     string  `json:"type"`
-	SourceUserProfileID      int     `json:"source_user_profile_id"`
-	TargetUserProfileID      *int    `json:"target_user_profile_id"`
-	SourceOrganizationUnitID int     `json:"source_organization_unit_id"`
-	TargetOrganizationUnitID int     `json:"target_organization_unit_id"`
-	IsAccepted               bool    `json:"is_accepted"`
-	SerialNumber             *string `json:"serial_number"`
-	OfficeID                 *int    `json:"office_id"`
-	DispatchDescription      *string `json:"dispatch_description"`
-	FileID                   *int    `json:"file_id"`
+	InventoryType            string     `json:"inventory_type"`
+	Type                     string     `json:"type"`
+	SourceUserProfileID      int        `json:"source_user_profile_id"`
+	TargetUserProfileID      *int       `json:"target_user_profile_id"`
+	SourceOrganizationUnitID int        `json:"source_organization_unit_id"`
+	TargetOrganizationUnitID int        `json:"target_organization_unit_id"`
+	IsAccepted               bool       `json:"is_accepted"`
+	Date                     *time.Time `json:"date"`
+	SerialNumber             *string    `json:"serial_number"`
+	OfficeID                 *int       `json:"office_id"`
+	DispatchDescription      *string    `json:"dispatch_description"`
+	FileID                   *int       `json:"file_id"`
 }
 
 type DispatchResponseDTO struct {
-	ID                       int       `json:"id"`
-	InventoryType            string    `json:"inventory_type"`
-	Type                     string    `json:"type"`
-	SourceUserProfileID      int       `json:"source_user_profile_id"`
-	TargetUserProfileID      *int      `json:"target_user_profile_id"`
-	SourceOrganizationUnitID int       `json:"source_organization_unit_id"`
-	TargetOrganizationUnitID int       `json:"target_organization_unit_id"`
-	IsAccepted               bool      `json:"is_accepted"`
-	SerialNumber             *string   `json:"serial_number"`
-	DispatchDescription      *string   `json:"dispatch_description"`
-	OfficeID                 *int      `json:"office_id"`
-	FileID                   *int      `json:"file_id"`
-	CreatedAt                time.Time `json:"created_at"`
-	UpdatedAt                time.Time `json:"updated_at"`
+	ID                       int        `json:"id"`
+	InventoryType            string     `json:"inventory_type"`
+	Type                     string     `json:"type"`
+	SourceUserProfileID      int        `json:"source_user_profile_id"`
+	TargetUserProfileID      *int       `json:"target_user_profile_id"`
+	SourceOrganizationUnitID int        `json:"source_organization_unit_id"`
+	TargetOrganizationUnitID int        `json:"target_organization_unit_id"`
+	IsAccepted               bool       `json:"is_accepted"`
+	Date                     *time.Time `json:"date"`
+	SerialNumber             *string    `json:"serial_number"`
+	DispatchDescription      *string    `json:"dispatch_description"`
+	OfficeID                 *int       `json:"office_id"`
+	FileID                   *int       `json:"file_id"`
+	CreatedAt                time.Time  `json:"created_at"`
+	UpdatedAt                time.Time  `json:"updated_at"`
 }
 
 func (dto DispatchDTO) ToDispatch() *data.Dispatch {
@@ -56,6 +58,7 @@ func (dto DispatchDTO) ToDispatch() *data.Dispatch {
 		SourceOrganizationUnitID: dto.SourceOrganizationUnitID,
 		TargetOrganizationUnitID: dto.TargetOrganizationUnitID,
 		OfficeID:                 dto.OfficeID,
+		Date:                     dto.Date,
 		IsAccepted:               dto.IsAccepted,
 		SerialNumber:             dto.SerialNumber,
 		DispatchDescription:      dto.DispatchDescription,
@@ -74,6 +77,7 @@ func ToDispatchResponseDTO(data data.Dispatch) DispatchResponseDTO {
 		TargetOrganizationUnitID: data.TargetOrganizationUnitID,
 		IsAccepted:               data.IsAccepted,
 		OfficeID:                 data.OfficeID,
+		Date:                     data.Date,
 		SerialNumber:             data.SerialNumber,
 		DispatchDescription:      data.DispatchDescription,
 		FileID:                   data.FileID,

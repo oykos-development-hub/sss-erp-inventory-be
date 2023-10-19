@@ -8,20 +8,21 @@ import (
 
 // Dispatch struct
 type Dispatch struct {
-	ID                       int       `db:"id,omitempty"`
-	Type                     string    `db:"type"`
-	InventoryType            string    `db:"inventory_type"`
-	SourceUserProfileID      int       `db:"source_user_profile_id"`
-	TargetUserProfileID      *int      `db:"target_user_profile_id"`
-	SourceOrganizationUnitID int       `db:"source_organization_unit_id"`
-	TargetOrganizationUnitID int       `db:"target_organization_unit_id"`
-	IsAccepted               bool      `db:"is_accepted"`
-	SerialNumber             *string   `db:"serial_number"`
-	OfficeID                 *int      `db:"office_id"`
-	DispatchDescription      *string   `db:"dispatch_description"`
-	FileID                   *int      `db:"file_id"`
-	CreatedAt                time.Time `db:"created_at,omitempty"`
-	UpdatedAt                time.Time `db:"updated_at"`
+	ID                       int        `db:"id,omitempty"`
+	Type                     string     `db:"type"`
+	InventoryType            string     `db:"inventory_type"`
+	SourceUserProfileID      int        `db:"source_user_profile_id"`
+	TargetUserProfileID      *int       `db:"target_user_profile_id"`
+	SourceOrganizationUnitID int        `db:"source_organization_unit_id"`
+	TargetOrganizationUnitID int        `db:"target_organization_unit_id"`
+	IsAccepted               bool       `db:"is_accepted"`
+	SerialNumber             *string    `db:"serial_number"`
+	OfficeID                 *int       `db:"office_id"`
+	Date                     *time.Time `db:"date"`
+	DispatchDescription      *string    `db:"dispatch_description"`
+	FileID                   *int       `db:"file_id"`
+	CreatedAt                time.Time  `db:"created_at,omitempty"`
+	UpdatedAt                time.Time  `db:"updated_at"`
 }
 
 // Table returns the table name

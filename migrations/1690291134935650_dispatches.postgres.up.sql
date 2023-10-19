@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS dispatches (
     is_accepted BOOLEAN NOT NULL DEFAULT FALSE,
     serial_number TEXT,
     office_id INTEGER,
+    date TIMESTAMP,
     dispatch_description TEXT,
     file_id INTEGER,
     created_at TIMESTAMP,
