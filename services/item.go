@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 
+	"github.com/upper/db/v4"
 	up "github.com/upper/db/v4"
 
 	"gitlab.sudovi.me/erp/inventory-api/data"
@@ -110,7 +111,11 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 	}
 
 	if filter.OrganizationUnitID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
+		orgUnit := up.Or(
+			db.Cond{"organization_unit_id ILIKE": *filter.OrganizationUnitID},
+			db.Cond{"target_organization_unit_id ILIKE": *filter.OrganizationUnitID},
+		)
+		conditionAndExp = up.And(conditionAndExp, orgUnit)
 	}
 
 	//bozo reko pretrazujemo samo naslov
