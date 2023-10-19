@@ -112,8 +112,8 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 
 	if filter.OrganizationUnitID != nil {
 		orgUnit := up.Or(
-			db.Cond{"organization_unit_id ILIKE": *filter.OrganizationUnitID},
-			db.Cond{"target_organization_unit_id ILIKE": *filter.OrganizationUnitID},
+			db.Cond{"organization_unit_id": *filter.OrganizationUnitID},
+			db.Cond{"target_organization_unit_id": *filter.OrganizationUnitID},
 		)
 		conditionAndExp = up.And(conditionAndExp, orgUnit)
 	}
