@@ -58,7 +58,7 @@ func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem
 		collection := upper.Collection(t.Table())
 		res = collection.Find(up.Cond{"dispatch_id": &dispatch})
 
-		err := res.OrderBy("created_at desc").All(&all)
+		err := res.OrderBy("id desc").All(&all)
 		if err != nil {
 			return nil, err
 		}
