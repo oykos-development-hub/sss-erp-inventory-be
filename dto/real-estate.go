@@ -22,7 +22,7 @@ type RealEstateDTO struct {
 	OwnershipScope           string `json:"ownership_scope" validate:"required"`
 	OwnershipInvestmentScope string `json:"ownership_investment_scope"`
 	LimitationsDescription   string `json:"limitations_description" validate:"required"`
-	LimitationID             string `json:"limitation_id"`
+	LimitationID             bool   `json:"limitation_id"`
 	PropertyDocument         string `json:"property_document"`
 	Document                 string `json:"document"`
 	FileID                   int    `json:"file_id"`
@@ -40,7 +40,7 @@ type RealEstateResponseDTO struct {
 	OwnershipScope           string    `json:"ownership_scope"`
 	OwnershipInvestmentScope string    `json:"ownership_investment_scope"`
 	LimitationsDescription   string    `json:"limitations_description"`
-	LimitationID             string    `json:"limitation_id"`
+	LimitationID             bool      `json:"limitation_id"`
 	PropertyDocument         string    `json:"property_document"`
 	Document                 string    `json:"document"`
 	FileID                   int       `json:"file_id"`

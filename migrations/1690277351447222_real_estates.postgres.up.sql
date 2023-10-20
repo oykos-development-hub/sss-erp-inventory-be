@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS real_estates (
     ownership_scope TEXT NOT NULL,
     ownership_investment_scope TEXT NOT NULL,
     limitations_description TEXT NOT NULL,
-    limitation_id TEXT,
+    limitation_id BOOLEAN,
     property_document TEXT,
     document TEXT,
     file_id INTEGER,

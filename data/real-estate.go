@@ -19,7 +19,7 @@ type RealEstate struct {
 	OwnershipScope           string    `db:"ownership_scope"`
 	OwnershipInvestmentScope string    `db:"ownership_investment_scope"`
 	LimitationsDescription   string    `db:"limitations_description"`
-	LimitationID             string    `db:"limitation_id"`
+	LimitationID             bool      `db:"limitation_id"`
 	PropertyDocument         string    `db:"property_document"`
 	Document                 string    `db:"document"`
 	FileID                   int       `db:"file_id"`
