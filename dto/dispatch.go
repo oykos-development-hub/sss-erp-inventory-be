@@ -7,13 +7,13 @@ import (
 )
 
 type GetDispatchListInput struct {
-	Page                     *int    `json:"page"`
-	Size                     *int    `json:"size"`
-	Id                       *int    `json:"id"`
-	Type                     *string `json:"string"`
-	SourceOrganizationUnitID *int    `json:"source_organization_unit_id"`
-	Accepted                 *bool   `json:"accepted"`
-	InventoryType            *string `json:"inventory_type"`
+	Page               *int    `json:"page"`
+	Size               *int    `json:"size"`
+	Id                 *int    `json:"id"`
+	Type               *string `json:"string"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
+	Accepted           *bool   `json:"accepted"`
+	InventoryType      *string `json:"inventory_type"`
 }
 
 type DispatchDTO struct {
