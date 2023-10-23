@@ -10,7 +10,7 @@ type GetDispatchListInput struct {
 	Page               *int    `json:"page"`
 	Size               *int    `json:"size"`
 	Id                 *int    `json:"id"`
-	Type               *string `json:"string"`
+	Type               *string `json:"type"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	Accepted           *bool   `json:"accepted"`
 	InventoryType      *string `json:"inventory_type"`
