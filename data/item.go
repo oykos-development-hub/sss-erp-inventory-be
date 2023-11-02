@@ -30,6 +30,7 @@ type Item struct {
 	GrossPrice                   int        `db:"gross_price"`
 	Description                  *string    `db:"description"`
 	DateOfPurchase               time.Time  `db:"date_of_purchase"`
+	Inactive                     *time.Time `db:"inactive"`
 	Source                       *string    `db:"source"`
 	SourceType                   *string    `db:"source_type"`
 	DonorTitle                   *string    `db:"donor_title"`

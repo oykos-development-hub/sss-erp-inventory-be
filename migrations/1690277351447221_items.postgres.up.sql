@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS items (
     gross_price INTEGER  NOT NULL,
     description TEXT,
     date_of_purchase DATE,
+    inactive DATE,
     source TEXT,
     source_type TEXT,
     donor_title TEXT,

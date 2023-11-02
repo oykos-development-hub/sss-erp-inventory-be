@@ -28,6 +28,7 @@ type ItemDTO struct {
 	GrossPrice                   int        `json:"gross_price"`
 	Description                  *string    `json:"description"`
 	DateOfPurchase               time.Time  `json:"date_of_purchase"`
+	Inactive                     *time.Time `json:"inactive"`
 	Source                       *string    `json:"source"`
 	SourceType                   *string    `json:"source_type"`
 	DonorTitle                   *string    `json:"donor_title"`
@@ -64,6 +65,7 @@ type ItemResponseDTO struct {
 	GrossPrice                   int        `json:"gross_price"`
 	Description                  *string    `json:"description"`
 	DateOfPurchase               time.Time  `json:"date_of_purchase"`
+	Inactive                     *time.Time `json:"inactive"`
 	Source                       *string    `json:"source"`
 	SourceType                   *string    `json:"source_type"`
 	DonorTitle                   *string    `json:"donor_title"`
@@ -89,6 +91,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		SerialNumber:                 dto.SerialNumber,
 		InventoryNumber:              dto.InventoryNumber,
 		Title:                        dto.Title,
+		Inactive:                     dto.Inactive,
 		Abbreviation:                 dto.Abbreviation,
 		InternalOwnership:            dto.InternalOwnership,
 		OfficeID:                     dto.OfficeID,
@@ -124,6 +127,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		ClassTypeID:                  data.ClassTypeID,
 		DepreciationTypeID:           data.DepreciationTypeID,
 		SupplierID:                   data.SupplierID,
+		Inactive:                     data.Inactive,
 		SerialNumber:                 data.SerialNumber,
 		InventoryNumber:              data.InventoryNumber,
 		Title:                        data.Title,
