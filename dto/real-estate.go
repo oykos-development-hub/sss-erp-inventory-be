@@ -12,20 +12,20 @@ type GetRealEstateListInput struct {
 }
 
 type RealEstateDTO struct {
-	Title                    string `json:"title" validate:"required"`
-	ItemID                   int    `json:"item_id" validate:"required"`
-	TypeID                   string `json:"type_id" validate:"required"`
-	SquareArea               int    `json:"square_area" validate:"required"`
-	LandSerialNumber         string `json:"land_serial_number" validate:"required"`
-	EstateSerialNumber       string `json:"estate_serial_number" validate:"required"`
-	OwnershipType            string `json:"ownership_type" validate:"required"`
-	OwnershipScope           string `json:"ownership_scope" validate:"required"`
-	OwnershipInvestmentScope string `json:"ownership_investment_scope"`
-	LimitationsDescription   string `json:"limitations_description" validate:"required"`
-	LimitationID             bool   `json:"limitation_id"`
-	PropertyDocument         string `json:"property_document"`
-	Document                 string `json:"document"`
-	FileID                   int    `json:"file_id"`
+	Title                    string  `json:"title" validate:"required"`
+	ItemID                   int     `json:"item_id" validate:"required"`
+	TypeID                   string  `json:"type_id" validate:"required"`
+	SquareArea               float32 `json:"square_area" validate:"required"`
+	LandSerialNumber         string  `json:"land_serial_number" validate:"required"`
+	EstateSerialNumber       string  `json:"estate_serial_number" validate:"required"`
+	OwnershipType            string  `json:"ownership_type" validate:"required"`
+	OwnershipScope           string  `json:"ownership_scope" validate:"required"`
+	OwnershipInvestmentScope string  `json:"ownership_investment_scope"`
+	LimitationsDescription   string  `json:"limitations_description" validate:"required"`
+	LimitationID             bool    `json:"limitation_id"`
+	PropertyDocument         string  `json:"property_document"`
+	Document                 string  `json:"document"`
+	FileID                   int     `json:"file_id"`
 }
 
 type RealEstateResponseDTO struct {
@@ -33,7 +33,7 @@ type RealEstateResponseDTO struct {
 	ItemID                   int       `json:"item_id"`
 	TypeID                   string    `json:"type_id"`
 	Title                    string    `json:"title"`
-	SquareArea               int       `json:"square_Area"`
+	SquareArea               float32   `json:"square_Area"`
 	LandSerialNumber         string    `json:"land_serial_number"`
 	EstateSerialNumber       string    `json:"estate_serial_number"`
 	OwnershipType            string    `json:"ownership_type"`

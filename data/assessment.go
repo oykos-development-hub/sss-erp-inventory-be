@@ -13,8 +13,8 @@ type Assessment struct {
 	Active               bool       `db:"active"`
 	DepreciationTypeID   int        `db:"depreciation_type_id"`
 	UserProfileID        *int       `db:"user_profile_id"`
-	GrossPriceNew        int        `db:"gross_price_new"`
-	GrossPriceDifference int        `db:"gross_price_difference"`
+	GrossPriceNew        float32    `db:"gross_price_new"`
+	GrossPriceDifference float32    `db:"gross_price_difference"`
 	DateOfAssessment     *time.Time `db:"date_of_assessment"`
 	CreatedAt            time.Time  `db:"created_at,omitempty"`
 	UpdatedAt            time.Time  `db:"updated_at"`

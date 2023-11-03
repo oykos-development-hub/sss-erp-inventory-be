@@ -24,8 +24,8 @@ type ItemDTO struct {
 	TargetOrganizationUnitID     *int       `json:"target_organization_unit_id"`
 	Unit                         *string    `json:"unit"`
 	Amount                       int        `json:"amount"`
-	NetPrice                     *int       `json:"net_price"`
-	GrossPrice                   int        `json:"gross_price"`
+	NetPrice                     *float32   `json:"net_price"`
+	GrossPrice                   float32    `json:"gross_price"`
 	Description                  *string    `json:"description"`
 	DateOfPurchase               time.Time  `json:"date_of_purchase"`
 	Inactive                     *time.Time `json:"inactive"`
@@ -61,8 +61,8 @@ type ItemResponseDTO struct {
 	TargetOrganizationUnitID     *int       `json:"target_organization_unit_id"`
 	Unit                         *string    `json:"unit"`
 	Amount                       int        `json:"amount"`
-	NetPrice                     *int       `json:"net_price"`
-	GrossPrice                   int        `json:"gross_price"`
+	NetPrice                     *float32   `json:"net_price"`
+	GrossPrice                   float32    `json:"gross_price"`
 	Description                  *string    `json:"description"`
 	DateOfPurchase               time.Time  `json:"date_of_purchase"`
 	Inactive                     *time.Time `json:"inactive"`

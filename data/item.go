@@ -26,8 +26,8 @@ type Item struct {
 	TargetOrganizationUnitID     *int       `db:"target_organization_unit_id"`
 	Unit                         *string    `db:"unit"`
 	Amount                       int        `db:"amount"`
-	NetPrice                     *int       `db:"net_price"`
-	GrossPrice                   int        `db:"gross_price"`
+	NetPrice                     *float32   `db:"net_price"`
+	GrossPrice                   float32    `db:"gross_price"`
 	Description                  *string    `db:"description"`
 	DateOfPurchase               time.Time  `db:"date_of_purchase"`
 	Inactive                     *time.Time `db:"inactive"`

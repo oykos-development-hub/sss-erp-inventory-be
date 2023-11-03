@@ -11,8 +11,8 @@ type AssessmentDTO struct {
 	Active               bool       `json:"active"`
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
-	GrossPriceNew        int        `json:"gross_price_new"`
-	GrossPriceDifference int        `json:"gross_price_difference"`
+	GrossPriceNew        float32    `json:"gross_price_new"`
+	GrossPriceDifference float32    `json:"gross_price_difference"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
 	FileID               *int       `json:"file_id,omitempty"`
 	Type                 string     `json:"type"`
@@ -24,8 +24,8 @@ type AssessmentResponseDTO struct {
 	Active               bool       `json:"active"`
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
-	GrossPriceNew        int        `json:"gross_price_new"`
-	GrossPriceDifference int        `json:"gross_price_difference"`
+	GrossPriceNew        float32    `json:"gross_price_new"`
+	GrossPriceDifference float32    `json:"gross_price_difference"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
 	CreatedAt            time.Time  `json:"created_at"`
 	UpdatedAt            time.Time  `json:"updated_at,omitempty"`
