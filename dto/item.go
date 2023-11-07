@@ -27,6 +27,7 @@ type ItemDTO struct {
 	NetPrice                     *float32   `json:"net_price"`
 	GrossPrice                   float32    `json:"gross_price"`
 	Description                  *string    `json:"description"`
+	IsUsed                       bool       `json:"is_used"`
 	DateOfPurchase               time.Time  `json:"date_of_purchase"`
 	Inactive                     *time.Time `json:"inactive"`
 	Source                       *string    `json:"source"`
@@ -52,6 +53,7 @@ type ItemResponseDTO struct {
 	SerialNumber                 *string    `json:"serial_number"`
 	InventoryNumber              string     `json:"inventory_number"`
 	Title                        string     `json:"title"`
+	IsUsed                       bool       `json:"is_used"`
 	Abbreviation                 *string    `json:"abbreviation"`
 	InternalOwnership            bool       `json:"internal_ownership"`
 	OfficeID                     int        `json:"office_id"`
@@ -95,6 +97,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		Abbreviation:                 dto.Abbreviation,
 		InternalOwnership:            dto.InternalOwnership,
 		OfficeID:                     dto.OfficeID,
+		IsUsed:                       dto.IsUsed,
 		Location:                     dto.Location,
 		TargetUserProfileID:          dto.TargetUserProfileID,
 		Unit:                         dto.Unit,
@@ -135,6 +138,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		InternalOwnership:            data.InternalOwnership,
 		OfficeID:                     data.OfficeID,
 		Location:                     data.Location,
+		IsUsed:                       data.IsUsed,
 		TargetUserProfileID:          data.TargetUserProfileID,
 		Unit:                         data.Unit,
 		Amount:                       data.Amount,

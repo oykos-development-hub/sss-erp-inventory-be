@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS items (
     source_type TEXT,
     donor_title TEXT,
     invoice_number TEXT,
+    is_used BOOLEAN DEFAULT false,
     active BOOLEAN,
     deactivation_description TEXT,
     date_of_assessment DATE,

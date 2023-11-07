@@ -40,6 +40,7 @@ type Item struct {
 	DateOfAssessment             *time.Time `db:"date_of_assessment"`
 	PriceOfAssessment            *int       `db:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int       `db:"lifetime_of_assessment_in_months"`
+	IsUsed                       bool       `db:"is_used"`
 	CreatedAt                    time.Time  `db:"created_at,omitempty"`
 	UpdatedAt                    time.Time  `db:"updated_at"`
 	InvoiceFileID                *int       `db:"invoice_file_id"`
