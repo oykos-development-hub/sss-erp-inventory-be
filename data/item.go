@@ -20,6 +20,7 @@ type Item struct {
 	Abbreviation                 *string    `db:"abbreviation"`
 	InternalOwnership            bool       `db:"internal_ownership"`
 	OfficeID                     int        `db:"office_id"`
+	ContractID int `db:"contract_id"`
 	Location                     *string    `db:"location"`
 	TargetUserProfileID          *int       `db:"target_user_profile_id"`
 	OrganizationUnitID           *int       `db:"organization_unit_id"`

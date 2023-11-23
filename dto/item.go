@@ -18,6 +18,7 @@ type ItemDTO struct {
 	Abbreviation                 *string    `json:"abbreviation"`
 	InternalOwnership            bool       `json:"internal_ownership"`
 	OfficeID                     int        `json:"office_id"`
+	ContractID                   int        `json:"contract_id"`
 	Location                     *string    `json:"location"`
 	TargetUserProfileID          *int       `json:"target_user_profile_id"`
 	OrganizationUnitID           *int       `json:"organization_unit_id"`
@@ -60,6 +61,7 @@ type ItemResponseDTO struct {
 	OrganizationUnitID           *int       `json:"organization_unit_id"`
 	TargetOrganizationUnitID     *int       `json:"target_organization_unit_id"`
 	Unit                         *string    `json:"unit"`
+	ContractID                   int        `json:"contract_id"`
 	Amount                       int        `json:"amount"`
 	NetPrice                     *float32   `json:"net_price"`
 	GrossPrice                   float32    `json:"gross_price"`
@@ -91,6 +93,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		SerialNumber:                 dto.SerialNumber,
 		InventoryNumber:              dto.InventoryNumber,
 		Title:                        dto.Title,
+		ContractID:                   dto.ContractID,
 		Inactive:                     dto.Inactive,
 		Abbreviation:                 dto.Abbreviation,
 		InternalOwnership:            dto.InternalOwnership,
@@ -131,6 +134,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		SerialNumber:                 data.SerialNumber,
 		InventoryNumber:              data.InventoryNumber,
 		Title:                        data.Title,
+		ContractID:                   data.ContractID,
 		Abbreviation:                 data.Abbreviation,
 		InternalOwnership:            data.InternalOwnership,
 		OfficeID:                     data.OfficeID,
@@ -166,6 +170,7 @@ type InventoryItemFilter struct {
 	ClassTypeID        *int    `json:"class_type_id"`
 	OfficeID           *int    `json:"office_id"`
 	Search             *string `json:"search"`
+	ContractID         *int    `json:"contract_id"`
 	SourceType         *string `json:"source_type"`
 	DeprecationTypeID  *int    `json:"depreciation_type_id"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`

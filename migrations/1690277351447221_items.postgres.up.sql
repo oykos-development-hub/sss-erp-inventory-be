@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS items (
     internal_ownership BOOLEAN  NOT NULL,
     office_id INTEGER,
     location TEXT,
+    contract_id INTEGER,
     organization_unit_id INTEGER,
     target_organization_unit_id INTEGER,
     target_user_profile_id INTEGER,
