@@ -9,6 +9,7 @@ import (
 type AssessmentDTO struct {
 	InventoryID          int        `json:"inventory_id"`
 	Active               bool       `json:"active"`
+	EstimatedDuration    int        `json:"estimated_duration"`
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
 	GrossPriceNew        float32    `json:"gross_price_new"`
@@ -24,6 +25,7 @@ type AssessmentResponseDTO struct {
 	Active               bool       `json:"active"`
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
+	EstimatedDuration    int        `json:"estimated_duration"`
 	GrossPriceNew        float32    `json:"gross_price_new"`
 	GrossPriceDifference float32    `json:"gross_price_difference"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
@@ -40,6 +42,7 @@ func (dto AssessmentDTO) ToAssessment() *data.Assessment {
 		DepreciationTypeID:   dto.DepreciationTypeID,
 		UserProfileID:        dto.UserProfileID,
 		GrossPriceNew:        dto.GrossPriceNew,
+		EstimatedDuration:    dto.EstimatedDuration,
 		GrossPriceDifference: dto.GrossPriceDifference,
 		DateOfAssessment:     dto.DateOfAssessment,
 		FileID:               dto.FileID,
@@ -55,6 +58,7 @@ func ToAssessmentResponseDTO(data data.Assessment) AssessmentResponseDTO {
 		DepreciationTypeID:   data.DepreciationTypeID,
 		UserProfileID:        data.UserProfileID,
 		GrossPriceNew:        data.GrossPriceNew,
+		EstimatedDuration:    data.EstimatedDuration,
 		GrossPriceDifference: data.GrossPriceDifference,
 		DateOfAssessment:     data.DateOfAssessment,
 		CreatedAt:            data.CreatedAt,
