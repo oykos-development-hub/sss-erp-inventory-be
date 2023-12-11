@@ -173,6 +173,7 @@ type InventoryItemFilter struct {
 	ContractID         *int    `json:"contract_id"`
 	SourceType         *string `json:"source_type"`
 	DeprecationTypeID  *int    `json:"depreciation_type_id"`
+	ArticleID          *int    `json:"article_id"`
 	OrganizationUnitID *int    `json:"organization_unit_id"`
 	Page               *int    `json:"page"`
 	Size               *int    `json:"size"`

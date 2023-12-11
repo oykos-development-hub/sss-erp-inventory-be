@@ -114,6 +114,10 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"contract_id": *filter.ContractID})
 	}
 
+	if filter.ArticleID != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"article_id": *filter.ContractID})
+	}
+
 	if filter.OrganizationUnitID != nil {
 		orgUnit := up.Or(
 			db.Cond{"organization_unit_id": *filter.OrganizationUnitID},
