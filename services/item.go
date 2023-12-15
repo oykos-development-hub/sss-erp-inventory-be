@@ -3,7 +3,6 @@ package services
 import (
 	"fmt"
 
-	"github.com/upper/db/v4"
 	up "github.com/upper/db/v4"
 
 	"gitlab.sudovi.me/erp/inventory-api/data"
@@ -120,8 +119,8 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 
 	if filter.OrganizationUnitID != nil {
 		orgUnit := up.Or(
-			db.Cond{"organization_unit_id": *filter.OrganizationUnitID},
-			db.Cond{"target_organization_unit_id": *filter.OrganizationUnitID},
+			up.Cond{"organization_unit_id": *filter.OrganizationUnitID},
+			up.Cond{"target_organization_unit_id": *filter.OrganizationUnitID},
 		)
 		conditionAndExp = up.And(conditionAndExp, orgUnit)
 	}
@@ -129,8 +128,8 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 	if filter.Search != nil {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
 		search := up.Or(
-			db.Cond{"title ILIKE": likeCondition},
-			db.Cond{"inventory_number ILIKE": likeCondition},
+			up.Cond{"title ILIKE": likeCondition},
+			up.Cond{"inventory_number ILIKE": likeCondition},
 		)
 		conditionAndExp = up.And(conditionAndExp, search)
 	}

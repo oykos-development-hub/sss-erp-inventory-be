@@ -7,6 +7,7 @@ CREATE TABLE assessments (
     user_profile_id INTEGER,
     gross_price_new FLOAT NOT NULL,
     gross_price_difference FLOAT NOT NULL,
+    residual_price FLOAT,
     date_of_assessment DATE,
     type_value TEXT NOT NULL,
     created_at TIMESTAMP,

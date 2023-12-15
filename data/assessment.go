@@ -16,6 +16,7 @@ type Assessment struct {
 	EstimatedDuration    int        `db:"estimated_duration"`
 	GrossPriceNew        float32    `db:"gross_price_new"`
 	GrossPriceDifference float32    `db:"gross_price_difference"`
+	ResidualPrice *float32 `db:"residual_price"`
 	DateOfAssessment     *time.Time `db:"date_of_assessment"`
 	CreatedAt            time.Time  `db:"created_at,omitempty"`
 	UpdatedAt            time.Time  `db:"updated_at"`
