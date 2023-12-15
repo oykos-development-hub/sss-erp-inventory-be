@@ -6,7 +6,6 @@ import (
 	"gitlab.sudovi.me/erp/inventory-api/errors"
 
 	"github.com/oykos-development-hub/celeritas"
-	"github.com/upper/db/v4"
 	up "github.com/upper/db/v4"
 )
 
@@ -94,8 +93,8 @@ func (h *DispatchServiceImpl) GetDispatchList(input *dto.GetDispatchListInput) (
 
 	if input.OrganizationUnitID != nil {
 		orgUnit := up.Or(
-			db.Cond{"source_organization_unit_id": *input.OrganizationUnitID},
-			db.Cond{"target_organization_unit_id": *input.OrganizationUnitID},
+			up.Cond{"source_organization_unit_id": *input.OrganizationUnitID},
+			up.Cond{"target_organization_unit_id": *input.OrganizationUnitID},
 		)
 		conditionAndExp = up.And(conditionAndExp, orgUnit)
 	}

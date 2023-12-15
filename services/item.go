@@ -126,10 +126,13 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 		conditionAndExp = up.And(conditionAndExp, orgUnit)
 	}
 
-	//bozo reko pretrazujemo samo naslov
 	if filter.Search != nil {
 		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"title ILIKE": likeCondition})
+		search := up.Or(
+			db.Cond{"title ILIKE": likeCondition},
+			db.Cond{"inventory_number ILIKE": likeCondition},
+		)
+		conditionAndExp = up.And(conditionAndExp, search)
 	}
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp)
