@@ -126,11 +126,11 @@ func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error 
 
 	query := `SELECT dispatch_id
 		    	FROM dispatches
-				WHERE target_organization_unit_id = source_organization_unit_id
+				WHERE target_organization_unit_id = source_organization_unit_id and AND source_organization_unit = $1
 				ORDER BY dispatch_id DESC
 				LIMIT 1`
 
-	rows, err := upper.SQL().Query(query)
+	rows, err := upper.SQL().Query(query, m.SourceOrganizationUnitID)
 	if err != nil {
 		return err
 	}
@@ -162,11 +162,11 @@ func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error 
 
 	query := `SELECT dispatch_id
 		    	FROM dispatches
-				WHERE target_organization_unit_id <> source_organization_unit_id
+				WHERE target_organization_unit_id <> source_organization_unit_id AND source_organization_unit = $1
 				ORDER BY dispatch_id DESC
 				LIMIT 1`
 
-	rows, err := upper.SQL().Query(query)
+	rows, err := upper.SQL().Query(query, m.SourceOrganizationUnitID)
 	if err != nil {
 		return err
 	}
