@@ -136,7 +136,7 @@ func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error 
 	}
 	defer rows.Close()
 
-	var dispatchID int
+	dispatchID := 0
 
 	for rows.Next() {
 		err = rows.Scan(&dispatchID)
@@ -172,7 +172,7 @@ func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error 
 	}
 	defer rows.Close()
 
-	var dispatchID int
+	dispatchID := 0
 
 	for rows.Next() {
 		err = rows.Scan(&dispatchID)
