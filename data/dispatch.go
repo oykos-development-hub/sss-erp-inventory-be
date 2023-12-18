@@ -106,6 +106,7 @@ func (t *Dispatch) Insert(m Dispatch) (int, error) {
 	}
 
 	id := getInsertId(res.ID())
+	m.ID = id
 
 	if m.SourceOrganizationUnitID == m.TargetOrganizationUnitID {
 		err = incrementDispatchIDForInternal(collection, m)
@@ -126,7 +127,7 @@ func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error 
 
 	query := `SELECT dispatch_id
 		    	FROM dispatches
-				WHERE target_organization_unit_id = source_organization_unit_id and AND source_organization_unit = $1
+				WHERE target_organization_unit_id = source_organization_unit_id AND source_organization_unit_id = $1
 				ORDER BY dispatch_id DESC
 				LIMIT 1`
 
@@ -146,8 +147,8 @@ func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error 
 	}
 
 	query = `UPDATE dispatches
-				WHERE id == $1
-				SET dispatch_id = $2`
+				SET dispatch_id = $2
+				WHERE id = $1`
 
 	dispatchID++
 	_, err = upper.SQL().Query(query, m.ID, dispatchID)
@@ -162,7 +163,7 @@ func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error 
 
 	query := `SELECT dispatch_id
 		    	FROM dispatches
-				WHERE target_organization_unit_id <> source_organization_unit_id AND source_organization_unit = $1
+				WHERE target_organization_unit_id <> source_organization_unit_id AND source_organization_unit_id = $1
 				ORDER BY dispatch_id DESC
 				LIMIT 1`
 
@@ -182,8 +183,8 @@ func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error 
 	}
 
 	query = `UPDATE dispatches
-				WHERE id = $1
-				SET dispatch_id = $2`
+				SET dispatch_id = $2
+				WHERE id = $1`
 
 	dispatchID++
 	_, err = upper.SQL().Query(query, m.ID, dispatchID)
