@@ -45,6 +45,7 @@ type Item struct {
 	UpdatedAt                    time.Time  `db:"updated_at"`
 	InvoiceFileID                *int       `db:"invoice_file_id"`
 	FileID                       *int       `db:"file_id"`
+	DeactivationFileID           *int       `db:"deactivation_file_id"`
 }
 
 // Table returns the table name

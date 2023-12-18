@@ -38,6 +38,7 @@ type ItemDTO struct {
 	DeactivationDescription      *string    `json:"deactivation_description"`
 	InvoiceFileID                *int       `json:"invoice_file_id"`
 	FileID                       *int       `json:"file_id"`
+	DeactivationFileID           *int       `json:"deactivation_file_id"`
 	DateOfAssessment             *time.Time `json:"date_of_assessment"`
 	PriceOfAssessment            *int       `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int       `json:"lifetime_of_assessment_in_months"`
@@ -81,6 +82,7 @@ type ItemResponseDTO struct {
 	UpdatedAt                    time.Time  `json:"updated_at"`
 	InvoiceFileID                *int       `json:"invoice_file_id"`
 	FileID                       *int       `json:"file_id"`
+	DeactivationFileID           *int       `json:"deactivation_file_id"`
 }
 
 func (dto ItemDTO) ToItem() *data.Item {
@@ -119,6 +121,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		TargetOrganizationUnitID:     dto.TargetOrganizationUnitID,
 		InvoiceFileID:                dto.InvoiceFileID,
 		FileID:                       dto.FileID,
+		DeactivationFileID:           dto.DeactivationFileID,
 	}
 }
 
@@ -161,6 +164,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		UpdatedAt:                    data.UpdatedAt,
 		InvoiceFileID:                data.InvoiceFileID,
 		FileID:                       data.FileID,
+		DeactivationFileID:           data.DeactivationFileID,
 	}
 }
 

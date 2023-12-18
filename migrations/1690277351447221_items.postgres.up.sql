@@ -36,5 +36,6 @@ CREATE TABLE IF NOT EXISTS items (
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     invoice_file_id INTEGER,
+    deactivation_file_id INTEGER,
     file_id INTEGER
 )
