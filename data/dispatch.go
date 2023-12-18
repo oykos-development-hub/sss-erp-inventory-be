@@ -108,12 +108,12 @@ func (t *Dispatch) Insert(m Dispatch) (int, error) {
 	id := getInsertId(res.ID())
 	m.ID = id
 
-	if m.SourceOrganizationUnitID == m.TargetOrganizationUnitID {
+	if m.Type == "allocation" {
 		err = incrementDispatchIDForInternal(collection, m)
 		if err != nil {
 			return 0, err
 		}
-	} else {
+	} else if m.Type == "revers" {
 		err = incrementDispatchIDForExternal(collection, m)
 		if err != nil {
 			return 0, err
