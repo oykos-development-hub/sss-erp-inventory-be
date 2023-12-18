@@ -33,6 +33,7 @@ type DispatchDTO struct {
 
 type DispatchResponseDTO struct {
 	ID                       int        `json:"id"`
+	DispatchDTO              int        `json:"dispatch_id"`
 	InventoryType            string     `json:"inventory_type"`
 	Type                     string     `json:"type"`
 	SourceUserProfileID      int        `json:"source_user_profile_id"`
@@ -69,6 +70,7 @@ func (dto DispatchDTO) ToDispatch() *data.Dispatch {
 func ToDispatchResponseDTO(data data.Dispatch) DispatchResponseDTO {
 	return DispatchResponseDTO{
 		ID:                       data.ID,
+		DispatchDTO:              data.DispatchID,
 		Type:                     data.Type,
 		InventoryType:            data.InventoryType,
 		SourceUserProfileID:      data.SourceUserProfileID,

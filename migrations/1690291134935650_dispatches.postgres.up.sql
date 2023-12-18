@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS dispatches (
     id serial PRIMARY KEY,
+    dispatch_id INTEGER,
     type TEXT NOT NULL,
     inventory_type TEXT NOT NULL,
     source_user_profile_id INTEGER NOT NULL,

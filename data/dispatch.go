@@ -9,6 +9,7 @@ import (
 // Dispatch struct
 type Dispatch struct {
 	ID                       int        `db:"id,omitempty"`
+	DispatchID               int        `db:"dispatch_id"`
 	Type                     string     `db:"type"`
 	InventoryType            string     `db:"inventory_type"`
 	SourceUserProfileID      int        `db:"source_user_profile_id"`
@@ -106,5 +107,89 @@ func (t *Dispatch) Insert(m Dispatch) (int, error) {
 
 	id := getInsertId(res.ID())
 
+	if m.SourceOrganizationUnitID == m.TargetOrganizationUnitID {
+		err = incrementDispatchIDForInternal(collection, m)
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		err = incrementDispatchIDForExternal(collection, m)
+		if err != nil {
+			return 0, err
+		}
+	}
+
 	return id, nil
+}
+
+func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error {
+
+	query := `SELECT dispatch_id
+		    	FROM dispatches
+				WHERE target_organization_unit_id = source_organization_unit_id
+				ORDER BY dispatch_id DESC
+				LIMIT 1`
+
+	rows, err := upper.SQL().Query(query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var dispatchID int
+
+	for rows.Next() {
+		err = rows.Scan(&dispatchID)
+		if err != nil {
+			return err
+		}
+	}
+
+	query = `UPDATE dispatches
+				WHERE id == $1
+				SET dispatch_id = $2`
+
+	dispatchID++
+	_, err = upper.SQL().Query(query, m.ID, dispatchID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error {
+
+	query := `SELECT dispatch_id
+		    	FROM dispatches
+				WHERE target_organization_unit_id <> source_organization_unit_id
+				ORDER BY dispatch_id DESC
+				LIMIT 1`
+
+	rows, err := upper.SQL().Query(query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var dispatchID int
+
+	for rows.Next() {
+		err = rows.Scan(&dispatchID)
+		if err != nil {
+			return err
+		}
+	}
+
+	query = `UPDATE dispatches
+				WHERE id = $1
+				SET dispatch_id = $2`
+
+	dispatchID++
+	_, err = upper.SQL().Query(query, m.ID, dispatchID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
