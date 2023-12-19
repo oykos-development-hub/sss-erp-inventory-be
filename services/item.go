@@ -125,6 +125,10 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 		conditionAndExp = up.And(conditionAndExp, &up.Cond{"inventory_number": *filter.InventoryNumber})
 	}
 
+	if filter.Location != nil {
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"location": *filter.Location})
+	}
+
 	if filter.OrganizationUnitID != nil {
 		orgUnit := up.Or(
 			up.Cond{"organization_unit_id": *filter.OrganizationUnitID},
