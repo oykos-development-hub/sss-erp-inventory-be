@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS items (
     class_type_id INTEGER  NOT NULL,
     depreciation_type_id INTEGER  NOT NULL,
     supplier_id INTEGER  NOT NULL,
+    donor_id INTEGER,
     serial_number TEXT,
     inventory_number TEXT  NOT NULL,
     title TEXT  NOT NULL,
