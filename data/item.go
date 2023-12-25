@@ -3,51 +3,54 @@ package data
 import (
 	"time"
 
+	"github.com/lib/pq"
 	up "github.com/upper/db/v4"
 )
 
 // Item struct
 type Item struct {
-	ID                           int        `db:"id,omitempty"`
-	ArticleID                    *int       `db:"article_id"`
-	Type                         string     `db:"type"`
-	ClassTypeID                  int        `db:"class_type_id"`
-	DepreciationTypeID           int        `db:"depreciation_type_id"`
-	SupplierID                   int        `db:"supplier_id"`
-	InvoiceID                    *int       `db:"invoice_id"`
-	DonorID                      *int       `db:"donor_id"`
-	SerialNumber                 *string    `db:"serial_number"`
-	InventoryNumber              string     `db:"inventory_number"`
-	Title                        string     `db:"title"`
-	Abbreviation                 *string    `db:"abbreviation"`
-	InternalOwnership            bool       `db:"internal_ownership"`
-	OfficeID                     int        `db:"office_id"`
-	ContractID                   int        `db:"contract_id"`
-	Location                     *string    `db:"location"`
-	TargetUserProfileID          *int       `db:"target_user_profile_id"`
-	OrganizationUnitID           *int       `db:"organization_unit_id"`
-	TargetOrganizationUnitID     *int       `db:"target_organization_unit_id"`
-	Unit                         *string    `db:"unit"`
-	Amount                       int        `db:"amount"`
-	NetPrice                     *float32   `db:"net_price"`
-	GrossPrice                   float32    `db:"gross_price"`
-	Description                  *string    `db:"description"`
-	DateOfPurchase               time.Time  `db:"date_of_purchase"`
-	Inactive                     *time.Time `db:"inactive"`
-	Source                       *string    `db:"source"`
-	SourceType                   *string    `db:"source_type"`
-	DonorTitle                   *string    `db:"donor_title"`
-	InvoiceNumber                *string    `db:"invoice_number"`
-	Active                       bool       `db:"active"`
-	DeactivationDescription      *string    `db:"deactivation_description"`
-	DateOfAssessment             *time.Time `db:"date_of_assessment"`
-	PriceOfAssessment            *int       `db:"price_of_assessment"`
-	LifetimeOfAssessmentInMonths *int       `db:"lifetime_of_assessment_in_months"`
-	CreatedAt                    time.Time  `db:"created_at,omitempty"`
-	UpdatedAt                    time.Time  `db:"updated_at"`
-	InvoiceFileID                *int       `db:"invoice_file_id"`
-	FileID                       *int       `db:"file_id"`
-	DeactivationFileID           *int       `db:"deactivation_file_id"`
+	ID                           int           `db:"id,omitempty"`
+	ArticleID                    *int          `db:"article_id"`
+	Type                         string        `db:"type"`
+	ClassTypeID                  int           `db:"class_type_id"`
+	DepreciationTypeID           int           `db:"depreciation_type_id"`
+	SupplierID                   int           `db:"supplier_id"`
+	InvoiceID                    *int          `db:"invoice_id"`
+	DonorID                      *int          `db:"donor_id"`
+	SerialNumber                 *string       `db:"serial_number"`
+	InventoryNumber              string        `db:"inventory_number"`
+	Title                        string        `db:"title"`
+	Abbreviation                 *string       `db:"abbreviation"`
+	InternalOwnership            bool          `db:"internal_ownership"`
+	OfficeID                     int           `db:"office_id"`
+	ContractID                   int           `db:"contract_id"`
+	Location                     *string       `db:"location"`
+	TargetUserProfileID          *int          `db:"target_user_profile_id"`
+	OrganizationUnitID           *int          `db:"organization_unit_id"`
+	TargetOrganizationUnitID     *int          `db:"target_organization_unit_id"`
+	Unit                         *string       `db:"unit"`
+	Amount                       int           `db:"amount"`
+	NetPrice                     *float32      `db:"net_price"`
+	GrossPrice                   float32       `db:"gross_price"`
+	Description                  *string       `db:"description"`
+	DateOfPurchase               time.Time     `db:"date_of_purchase"`
+	Inactive                     *time.Time    `db:"inactive"`
+	Source                       *string       `db:"source"`
+	SourceType                   *string       `db:"source_type"`
+	DonorTitle                   *string       `db:"donor_title"`
+	InvoiceNumber                *string       `db:"invoice_number"`
+	Active                       bool          `db:"active"`
+	DeactivationDescription      *string       `db:"deactivation_description"`
+	DateOfAssessment             *time.Time    `db:"date_of_assessment"`
+	PriceOfAssessment            *int          `db:"price_of_assessment"`
+	LifetimeOfAssessmentInMonths *int          `db:"lifetime_of_assessment_in_months"`
+	DonationDescription          *string       `db:"donation_description"`
+	DonationFiles                pq.Int64Array `db:"donation_files"`
+	CreatedAt                    time.Time     `db:"created_at,omitempty"`
+	UpdatedAt                    time.Time     `db:"updated_at"`
+	InvoiceFileID                *int          `db:"invoice_file_id"`
+	FileID                       *int          `db:"file_id"`
+	DeactivationFileID           *int          `db:"deactivation_file_id"`
 }
 
 // Table returns the table name

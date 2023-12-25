@@ -3,47 +3,50 @@ package dto
 import (
 	"time"
 
+	"github.com/lib/pq"
 	"gitlab.sudovi.me/erp/inventory-api/data"
 )
 
 type ItemDTO struct {
-	ArticleID                    *int       `json:"article_id"`
-	Type                         string     `json:"type"`
-	ClassTypeID                  int        `json:"class_type_id"`
-	DepreciationTypeID           int        `json:"depreciation_type_id"`
-	SupplierID                   int        `json:"supplier_id"`
-	InvoiceID                    *int       `json:"invoice_id"`
-	DonorID                      *int       `json:"donor_id"`
-	SerialNumber                 *string    `json:"serial_number"`
-	InventoryNumber              string     `json:"inventory_number"`
-	Title                        string     `json:"title"`
-	Abbreviation                 *string    `json:"abbreviation"`
-	InternalOwnership            bool       `json:"internal_ownership"`
-	OfficeID                     int        `json:"office_id"`
-	ContractID                   int        `json:"contract_id"`
-	Location                     *string    `json:"location"`
-	TargetUserProfileID          *int       `json:"target_user_profile_id"`
-	OrganizationUnitID           *int       `json:"organization_unit_id"`
-	TargetOrganizationUnitID     *int       `json:"target_organization_unit_id"`
-	Unit                         *string    `json:"unit"`
-	Amount                       int        `json:"amount"`
-	NetPrice                     *float32   `json:"net_price"`
-	GrossPrice                   float32    `json:"gross_price"`
-	Description                  *string    `json:"description"`
-	DateOfPurchase               time.Time  `json:"date_of_purchase"`
-	Inactive                     *time.Time `json:"inactive"`
-	Source                       *string    `json:"source"`
-	SourceType                   *string    `json:"source_type"`
-	DonorTitle                   *string    `json:"donor_title"`
-	InvoiceNumber                *string    `json:"invoice_number"`
-	Active                       bool       `json:"active"`
-	DeactivationDescription      *string    `json:"deactivation_description"`
-	InvoiceFileID                *int       `json:"invoice_file_id"`
-	FileID                       *int       `json:"file_id"`
-	DeactivationFileID           *int       `json:"deactivation_file_id"`
-	DateOfAssessment             *time.Time `json:"date_of_assessment"`
-	PriceOfAssessment            *int       `json:"price_of_assessment"`
-	LifetimeOfAssessmentInMonths *int       `json:"lifetime_of_assessment_in_months"`
+	ArticleID                    *int          `json:"article_id"`
+	Type                         string        `json:"type"`
+	ClassTypeID                  int           `json:"class_type_id"`
+	DepreciationTypeID           int           `json:"depreciation_type_id"`
+	SupplierID                   int           `json:"supplier_id"`
+	InvoiceID                    *int          `json:"invoice_id"`
+	DonorID                      *int          `json:"donor_id"`
+	SerialNumber                 *string       `json:"serial_number"`
+	InventoryNumber              string        `json:"inventory_number"`
+	Title                        string        `json:"title"`
+	Abbreviation                 *string       `json:"abbreviation"`
+	InternalOwnership            bool          `json:"internal_ownership"`
+	OfficeID                     int           `json:"office_id"`
+	ContractID                   int           `json:"contract_id"`
+	Location                     *string       `json:"location"`
+	TargetUserProfileID          *int          `json:"target_user_profile_id"`
+	OrganizationUnitID           *int          `json:"organization_unit_id"`
+	TargetOrganizationUnitID     *int          `json:"target_organization_unit_id"`
+	Unit                         *string       `json:"unit"`
+	Amount                       int           `json:"amount"`
+	NetPrice                     *float32      `json:"net_price"`
+	GrossPrice                   float32       `json:"gross_price"`
+	Description                  *string       `json:"description"`
+	DateOfPurchase               time.Time     `json:"date_of_purchase"`
+	Inactive                     *time.Time    `json:"inactive"`
+	Source                       *string       `json:"source"`
+	SourceType                   *string       `json:"source_type"`
+	DonorTitle                   *string       `json:"donor_title"`
+	DonationDescription          *string       `json:"donation_description"`
+	DonationFiles                pq.Int64Array `json:"donation_files"`
+	InvoiceNumber                *string       `json:"invoice_number"`
+	Active                       bool          `json:"active"`
+	DeactivationDescription      *string       `json:"deactivation_description"`
+	InvoiceFileID                *int          `json:"invoice_file_id"`
+	FileID                       *int          `json:"file_id"`
+	DeactivationFileID           *int          `json:"deactivation_file_id"`
+	DateOfAssessment             *time.Time    `json:"date_of_assessment"`
+	PriceOfAssessment            *int          `json:"price_of_assessment"`
+	LifetimeOfAssessmentInMonths *int          `json:"lifetime_of_assessment_in_months"`
 }
 
 type ItemResponseDTO struct {
@@ -82,6 +85,8 @@ type ItemResponseDTO struct {
 	DateOfAssessment             *time.Time `json:"date_of_assessment"`
 	PriceOfAssessment            *int       `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int       `json:"lifetime_of_assessment_in_months"`
+	DonationDescription          *string    `json:"donation_description"`
+	DonationFiles                []int      `json:"donation_files"`
 	CreatedAt                    time.Time  `json:"created_at"`
 	UpdatedAt                    time.Time  `json:"updated_at"`
 	InvoiceFileID                *int       `json:"invoice_file_id"`
@@ -128,10 +133,19 @@ func (dto ItemDTO) ToItem() *data.Item {
 		InvoiceFileID:                dto.InvoiceFileID,
 		FileID:                       dto.FileID,
 		DeactivationFileID:           dto.DeactivationFileID,
+		DonationDescription:          dto.DonationDescription,
+		DonationFiles:                dto.DonationFiles,
 	}
 }
 
 func ToItemResponseDTO(data data.Item) ItemResponseDTO {
+
+	var donationFiles []int
+
+	for _, fileID := range data.DonationFiles {
+		donationFiles = append(donationFiles, int(fileID))
+	}
+
 	return ItemResponseDTO{
 		ID:                           data.ID,
 		ArticleID:                    data.ArticleID,
@@ -173,6 +187,8 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		InvoiceFileID:                data.InvoiceFileID,
 		FileID:                       data.FileID,
 		DeactivationFileID:           data.DeactivationFileID,
+		DonationDescription:          data.DonationDescription,
+		DonationFiles:                donationFiles,
 	}
 }
 
