@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS items (
     office_id INTEGER,
     location TEXT,
     contract_id INTEGER,
+    invoice_id INTEGER,
     organization_unit_id INTEGER,
     target_organization_unit_id INTEGER,
     target_user_profile_id INTEGER,

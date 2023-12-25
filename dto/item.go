@@ -12,6 +12,7 @@ type ItemDTO struct {
 	ClassTypeID                  int        `json:"class_type_id"`
 	DepreciationTypeID           int        `json:"depreciation_type_id"`
 	SupplierID                   int        `json:"supplier_id"`
+	InvoiceID                    int        `json:"invoice_id"`
 	DonorID                      *int       `json:"donor_id"`
 	SerialNumber                 *string    `json:"serial_number"`
 	InventoryNumber              string     `json:"inventory_number"`
@@ -53,6 +54,7 @@ type ItemResponseDTO struct {
 	DepreciationTypeID           int        `json:"depreciation_type_id"`
 	SupplierID                   int        `json:"supplier_id"`
 	DonorID                      *int       `json:"donor_id"`
+	InvoiceID                    int        `json:"invoice_id"`
 	SerialNumber                 *string    `json:"serial_number"`
 	InventoryNumber              string     `json:"inventory_number"`
 	Title                        string     `json:"title"`
@@ -95,6 +97,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		DepreciationTypeID:           dto.DepreciationTypeID,
 		SupplierID:                   dto.SupplierID,
 		DonorID:                      dto.DonorID,
+		InvoiceID:                    dto.InvoiceID,
 		SerialNumber:                 dto.SerialNumber,
 		InventoryNumber:              dto.InventoryNumber,
 		Title:                        dto.Title,
@@ -145,6 +148,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		Abbreviation:                 data.Abbreviation,
 		InternalOwnership:            data.InternalOwnership,
 		OfficeID:                     data.OfficeID,
+		InvoiceID:                    data.InvoiceID,
 		Location:                     data.Location,
 		TargetUserProfileID:          data.TargetUserProfileID,
 		Unit:                         data.Unit,
