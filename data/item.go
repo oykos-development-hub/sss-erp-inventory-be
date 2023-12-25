@@ -14,7 +14,7 @@ type Item struct {
 	ClassTypeID                  int        `db:"class_type_id"`
 	DepreciationTypeID           int        `db:"depreciation_type_id"`
 	SupplierID                   int        `db:"supplier_id"`
-	InvoiceID                    int        `db:"invoice_id"`
+	InvoiceID                    *int       `db:"invoice_id"`
 	DonorID                      *int       `db:"donor_id"`
 	SerialNumber                 *string    `db:"serial_number"`
 	InventoryNumber              string     `db:"inventory_number"`
