@@ -16,7 +16,7 @@ type ItemDTO struct {
 	InvoiceID                    *int          `json:"invoice_id"`
 	DonorID                      *int          `json:"donor_id"`
 	SerialNumber                 *string       `json:"serial_number"`
-	InventoryNumber              string        `json:"inventory_number"`
+	InventoryNumber              *string       `json:"inventory_number"`
 	Title                        string        `json:"title"`
 	Abbreviation                 *string       `json:"abbreviation"`
 	InternalOwnership            bool          `json:"internal_ownership"`
@@ -60,7 +60,7 @@ type ItemResponseDTO struct {
 	DonorID                      *int       `json:"donor_id"`
 	InvoiceID                    *int       `json:"invoice_id"`
 	SerialNumber                 *string    `json:"serial_number"`
-	InventoryNumber              string     `json:"inventory_number"`
+	InventoryNumber              *string    `json:"inventory_number"`
 	Title                        string     `json:"title"`
 	Abbreviation                 *string    `json:"abbreviation"`
 	InternalOwnership            bool       `json:"internal_ownership"`

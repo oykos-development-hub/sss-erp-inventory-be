@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS items (
     supplier_id INTEGER  NOT NULL,
     donor_id INTEGER,
     serial_number TEXT,
-    inventory_number TEXT  NOT NULL,
+    inventory_number TEXT,
     title TEXT  NOT NULL,
     abbreviation TEXT,
     internal_ownership BOOLEAN  NOT NULL,

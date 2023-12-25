@@ -18,7 +18,7 @@ type Item struct {
 	InvoiceID                    *int          `db:"invoice_id"`
 	DonorID                      *int          `db:"donor_id"`
 	SerialNumber                 *string       `db:"serial_number"`
-	InventoryNumber              string        `db:"inventory_number"`
+	InventoryNumber              *string       `db:"inventory_number"`
 	Title                        string        `db:"title"`
 	Abbreviation                 *string       `db:"abbreviation"`
 	InternalOwnership            bool          `db:"internal_ownership"`
