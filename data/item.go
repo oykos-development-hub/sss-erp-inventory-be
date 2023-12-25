@@ -55,9 +55,10 @@ type Item struct {
 }
 
 type ItemInOrganizationUnit struct {
-	ItemID   int `json:"item_id"`
-	ReversID int `json:"revers_id"`
-	ReturnID int `json:"return_id"`
+	ItemID      int   `json:"item_id"`
+	ReversID    int   `json:"revers_id"`
+	ReturnID    int   `json:"return_id"`
+	MovementsID []int `json:"movements_id"`
 }
 
 // Table returns the table name
@@ -175,6 +176,25 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 			err = rowDispatch.Scan(&item.ReturnID)
 			if err != nil {
 				return nil, err
+			}
+
+			query = `select d.id from items i, dispatches d, dispatch_items di 
+					 where i.id = di.inventory_id and d.id = di.dispatch_id and i.id = $1 
+					 and d.id >= $2 and d.id <= $3;
+			`
+			rowMedium, err := upper.SQL().Query(query, item.ItemID, item.ReversID, item.ReturnID)
+			if err != nil {
+				return nil, err
+			}
+			defer rowMedium.Close()
+
+			for rowMedium.Next() {
+				var id int
+				err = rowDispatch.Scan(&id)
+				if err != nil {
+					return nil, err
+				}
+				item.MovementsID = append(item.MovementsID, id)
 			}
 
 			items = append(items, item)
