@@ -54,6 +54,12 @@ type Item struct {
 	IsExternalDonation           bool          `db:"is_external_donation"`
 }
 
+type ItemInOrganizationUnit struct {
+	ItemID   int `json:"item_id"`
+	ReversID int `json:"revers_id"`
+	ReturnID int `json:"return_id"`
+}
+
 // Table returns the table name
 func (t *Item) Table() string {
 	return "items"
@@ -136,4 +142,41 @@ func (t *Item) Insert(m Item) (int, error) {
 	id := getInsertId(res.ID())
 
 	return id, nil
+}
+
+func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
+	var items []ItemInOrganizationUnit
+	query := ` select i.id, d.id from items i, dispatches d, dispatch_items di 
+			   where i.id = di.inventory_id and d.id = di.dispatch_id and d.target_organization_unit_id = $1;`
+
+	rows, err := upper.SQL().Query(query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item ItemInOrganizationUnit
+		err = rows.Scan(&item.ItemID, &item.ReversID)
+		if err != nil {
+			return nil, err
+		}
+
+		query = `select d.id from dispatches d, dispatch_items i 
+				 where d.id > $1 and d.type = 'return-revers' and i.inventory_id = $2 
+				 and d.id = i.dispatch_id order by d.id;`
+		rowDispatch, err := upper.SQL().Query(query, item.ReversID, item.ItemID)
+		if err != nil {
+			return nil, err
+		}
+		defer rowDispatch.Close()
+
+		err = rowDispatch.Scan(&item.ReturnID)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, err
 }

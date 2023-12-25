@@ -155,3 +155,13 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 	response := dto.ToItemListResponseDTO(data)
 	return response, total, nil
 }
+
+func (h *ItemServiceImpl) GetItemListInOrganizationUnit(id int) ([]data.ItemInOrganizationUnit, error) {
+	data, err := h.repo.GetAllInOrgUnit(id)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	return data, nil
+}

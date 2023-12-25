@@ -27,6 +27,7 @@ type ItemHandler interface {
 	DeleteItem(w http.ResponseWriter, r *http.Request)
 	GetItemById(w http.ResponseWriter, r *http.Request)
 	GetItemList(w http.ResponseWriter, r *http.Request)
+	GetItemListInOrganizationUnit(w http.ResponseWriter, r *http.Request)
 }
 
 type AssessmentHandler interface {

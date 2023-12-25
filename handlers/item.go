@@ -98,6 +98,18 @@ func (h *itemHandlerImpl) GetItemById(w http.ResponseWriter, r *http.Request) {
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
 
+func (h *itemHandlerImpl) GetItemListInOrganizationUnit(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	res, err := h.service.GetItemListInOrganizationUnit(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
 func (h *itemHandlerImpl) GetItemList(w http.ResponseWriter, r *http.Request) {
 	var input dto.InventoryItemFilter
 	err := h.App.ReadJSON(w, r, &input)

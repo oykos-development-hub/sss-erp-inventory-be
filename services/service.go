@@ -1,6 +1,7 @@
 package services
 
 import (
+	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
 )
 
@@ -25,6 +26,7 @@ type ItemService interface {
 	DeleteItem(id int) error
 	GetItem(id int) (*dto.ItemResponseDTO, error)
 	GetItemList(filter dto.InventoryItemFilter) ([]dto.ItemResponseDTO, *uint64, error)
+	GetItemListInOrganizationUnit(id int) ([]data.ItemInOrganizationUnit, error)
 }
 
 type AssessmentService interface {
