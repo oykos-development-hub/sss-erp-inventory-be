@@ -36,6 +36,7 @@ type ItemDTO struct {
 	Source                       *string       `json:"source"`
 	SourceType                   *string       `json:"source_type"`
 	DonorTitle                   *string       `json:"donor_title"`
+	IsExternalDonation           bool          `json:"is_external_donation"`
 	DonationDescription          *string       `json:"donation_description"`
 	DonationFiles                pq.Int64Array `json:"donation_files"`
 	InvoiceNumber                *string       `json:"invoice_number"`
@@ -69,6 +70,7 @@ type ItemResponseDTO struct {
 	OrganizationUnitID           *int       `json:"organization_unit_id"`
 	TargetOrganizationUnitID     *int       `json:"target_organization_unit_id"`
 	Unit                         *string    `json:"unit"`
+	IsExternalDonation           bool       `json:"is_external_donation"`
 	ContractID                   int        `json:"contract_id"`
 	Amount                       int        `json:"amount"`
 	NetPrice                     *float32   `json:"net_price"`
@@ -108,6 +110,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		Title:                        dto.Title,
 		ContractID:                   dto.ContractID,
 		Inactive:                     dto.Inactive,
+		IsExternalDonation:           dto.IsExternalDonation,
 		Abbreviation:                 dto.Abbreviation,
 		InternalOwnership:            dto.InternalOwnership,
 		OfficeID:                     dto.OfficeID,
@@ -158,6 +161,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		SerialNumber:                 data.SerialNumber,
 		InventoryNumber:              data.InventoryNumber,
 		Title:                        data.Title,
+		IsExternalDonation:           data.IsExternalDonation,
 		ContractID:                   data.ContractID,
 		Abbreviation:                 data.Abbreviation,
 		InternalOwnership:            data.InternalOwnership,

@@ -51,6 +51,7 @@ type Item struct {
 	InvoiceFileID                *int          `db:"invoice_file_id"`
 	FileID                       *int          `db:"file_id"`
 	DeactivationFileID           *int          `db:"deactivation_file_id"`
+	IsExternalDonation           bool          `db:"is_external_donation"`
 }
 
 // Table returns the table name

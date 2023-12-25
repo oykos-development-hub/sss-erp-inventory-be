@@ -39,5 +39,8 @@ CREATE TABLE IF NOT EXISTS items (
     updated_at TIMESTAMP,
     invoice_file_id INTEGER,
     deactivation_file_id INTEGER,
-    file_id INTEGER
+    file_id INTEGER,
+    donation_description TEXT,
+    donation_files []INTEGER,
+    is_external_donation BOOLEAN,
 )
