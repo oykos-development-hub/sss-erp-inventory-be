@@ -147,10 +147,10 @@ func (t *Item) Insert(m Item) (int, error) {
 
 func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 	var items []ItemInOrganizationUnit
-	query := `select i.id, d.id from items i, dispatches d, dispatch_items di 
+	query1 := `select i.id, d.id from items i, dispatches d, dispatch_items di 
 			   where i.id = di.inventory_id and d.id = di.dispatch_id and d.target_organization_unit_id = $1;`
 
-	rows, err := upper.SQL().Query(query, id)
+	rows, err := upper.SQL().Query(query1, id)
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +163,10 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 			return nil, err
 		}
 
-		query = `select d.id from dispatches d, dispatch_items i 
+		query2 := `select d.id from dispatches d, dispatch_items i 
 				 where d.id > $1 and d.type = 'return-revers' and i.inventory_id = $2 
 				 and d.id = i.dispatch_id order by d.id;`
-		rowDispatch, err := upper.SQL().Query(query, item.ReversID, item.ItemID)
+		rowDispatch, err := upper.SQL().Query(query2, item.ReversID, item.ItemID)
 		if err != nil {
 			return nil, err
 		}
@@ -178,11 +178,11 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 				return nil, err
 			}
 
-			query = `select d.id from items i, dispatches d, dispatch_items di 
+			query3 := `select d.id from items i, dispatches d, dispatch_items di 
 					 where i.id = di.inventory_id and d.id = di.dispatch_id and i.id = $1 
 					 and d.id >= $2 and d.id <= $3;
 			`
-			rowMedium, err := upper.SQL().Query(query, item.ItemID, item.ReversID, item.ReturnID)
+			rowMedium, err := upper.SQL().Query(query3, item.ItemID, item.ReversID, item.ReturnID)
 			if err != nil {
 				return nil, err
 			}
@@ -190,7 +190,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 
 			for rowMedium.Next() {
 				var id int
-				err = rowDispatch.Scan(&id)
+				err = rowMedium.Scan(&id)
 				if err != nil {
 					return nil, err
 				}
