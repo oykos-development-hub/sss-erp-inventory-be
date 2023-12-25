@@ -178,6 +178,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 			}
 
 			items = append(items, item)
+			break
 		}
 	}
 
