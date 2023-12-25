@@ -146,7 +146,7 @@ func (t *Item) Insert(m Item) (int, error) {
 
 func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 	var items []ItemInOrganizationUnit
-	query := ` select i.id, d.id from items i, dispatches d, dispatch_items di 
+	query := `select i.id, d.id from items i, dispatches d, dispatch_items di 
 			   where i.id = di.inventory_id and d.id = di.dispatch_id and d.target_organization_unit_id = $1;`
 
 	rows, err := upper.SQL().Query(query, id)
@@ -171,11 +171,14 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 		}
 		defer rowDispatch.Close()
 
-		err = rowDispatch.Scan(&item.ReturnID)
-		if err != nil {
-			return nil, err
+		for rowDispatch.Next() {
+			err = rowDispatch.Scan(&item.ReturnID)
+			if err != nil {
+				return nil, err
+			}
+
+			items = append(items, item)
 		}
-		items = append(items, item)
 	}
 
 	return items, err
