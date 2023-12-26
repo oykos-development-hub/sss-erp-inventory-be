@@ -31,6 +31,19 @@ func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
 	return all, err
 }
 
+func (t *DispatchItem) GetItemListOfDispatch(dispatchID int) ([]*DispatchItem, error) {
+	collection := upper.Collection(t.Table())
+	var all []*DispatchItem
+
+	res := collection.Find(up.Cond{"dispatch_id": dispatchID})
+	err := res.OrderBy("id desc").All(&all)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+}
+
 func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem, error) {
 	var all []*DispatchItem
 

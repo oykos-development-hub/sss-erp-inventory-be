@@ -52,6 +52,7 @@ type Item struct {
 	FileID                       *int          `db:"file_id"`
 	DeactivationFileID           *int          `db:"deactivation_file_id"`
 	IsExternalDonation           bool          `db:"is_external_donation"`
+	Owner                        *string       `db:"owner"`
 }
 
 type ItemInOrganizationUnit struct {

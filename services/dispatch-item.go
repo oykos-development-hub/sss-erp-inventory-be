@@ -9,14 +9,16 @@ import (
 )
 
 type DispatchItemServiceImpl struct {
-	App  *celeritas.Celeritas
-	repo data.DispatchItem
+	App      *celeritas.Celeritas
+	repo     data.DispatchItem
+	itemRepo data.Item
 }
 
-func NewDispatchItemServiceImpl(app *celeritas.Celeritas, repo data.DispatchItem) DispatchItemService {
+func NewDispatchItemServiceImpl(app *celeritas.Celeritas, repo data.DispatchItem, itemRepo data.Item) DispatchItemService {
 	return &DispatchItemServiceImpl{
-		App:  app,
-		repo: repo,
+		App:      app,
+		repo:     repo,
+		itemRepo: itemRepo,
 	}
 }
 
@@ -74,6 +76,27 @@ func (h *DispatchItemServiceImpl) GetDispatchItemList(id int) ([]dto.DispatchIte
 		return nil, errors.ErrInternalServer
 	}
 	response := dto.ToDispatchItemListResponseDTO(data)
+
+	return response, nil
+}
+
+func (h *DispatchItemServiceImpl) GetItemListOfDispatch(dispatchID int) ([]dto.ItemResponseDTO, error) {
+	dispatchItems, err := h.repo.GetItemListOfDispatch(dispatchID)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	var items []*data.Item
+	for _, dispatchItem := range dispatchItems {
+		item, err := h.itemRepo.Get(dispatchItem.InventoryId)
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return nil, errors.ErrInternalServer
+		}
+		items = append(items, item)
+	}
+	response := dto.ToItemListResponseDTO(items)
 
 	return response, nil
 }

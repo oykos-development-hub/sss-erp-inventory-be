@@ -48,6 +48,7 @@ type ItemDTO struct {
 	DateOfAssessment             *time.Time    `json:"date_of_assessment"`
 	PriceOfAssessment            *int          `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int          `json:"lifetime_of_assessment_in_months"`
+	Owner                        *string       `json:"owner"`
 }
 
 type ItemResponseDTO struct {
@@ -94,6 +95,7 @@ type ItemResponseDTO struct {
 	InvoiceFileID                *int       `json:"invoice_file_id"`
 	FileID                       *int       `json:"file_id"`
 	DeactivationFileID           *int       `json:"deactivation_file_id"`
+	Owner                        *string    `json:"owner"`
 }
 
 func (dto ItemDTO) ToItem() *data.Item {
@@ -138,6 +140,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		DeactivationFileID:           dto.DeactivationFileID,
 		DonationDescription:          dto.DonationDescription,
 		DonationFiles:                dto.DonationFiles,
+		Owner:                        dto.Owner,
 	}
 }
 
@@ -193,6 +196,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		DeactivationFileID:           data.DeactivationFileID,
 		DonationDescription:          data.DonationDescription,
 		DonationFiles:                donationFiles,
+		Owner:                        data.Owner,
 	}
 }
 

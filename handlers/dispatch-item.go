@@ -98,6 +98,18 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByItemId(w http.ResponseWri
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
 }
 
+func (h *dispatchitemHandlerImpl) GetItemsByDispatch(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	res, err := h.service.GetItemListOfDispatch(id)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "", res)
+}
+
 func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWriter, r *http.Request) {
 	var input dto.DispatchItemStatus
 	err := h.App.ReadJSON(w, r, &input)

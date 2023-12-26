@@ -38,7 +38,7 @@ func initApplication() *celeritas.Celeritas {
 	DispatchService := services.NewDispatchServiceImpl(cel, models.Dispatch)
 	DispatchHandler := handlers.NewDispatchHandler(cel, DispatchService)
 
-	DispatchItemService := services.NewDispatchItemServiceImpl(cel, models.DispatchItem)
+	DispatchItemService := services.NewDispatchItemServiceImpl(cel, models.DispatchItem, models.Item)
 	DispatchItemHandler := handlers.NewDispatchItemHandler(cel, DispatchItemService)
 
 	AssessmentService := services.NewAssessmentServiceImpl(cel, models.Assessment)
