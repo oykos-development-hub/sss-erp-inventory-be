@@ -130,7 +130,7 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.OrganizationUnitID})
+		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.SourceOrganizationUnitID})
 	}
 
 	if filter.OrganizationUnitID != nil {
