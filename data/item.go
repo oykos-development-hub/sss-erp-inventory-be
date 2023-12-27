@@ -146,6 +146,7 @@ func (t *Item) Insert(m Item) (int, error) {
 	return id, nil
 }
 
+// Get items by org unit
 func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 	var items []ItemInOrganizationUnit
 	query1 := `select i.id, d.id from items i, dispatches d, dispatch_items di 

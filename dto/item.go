@@ -201,21 +201,22 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 }
 
 type InventoryItemFilter struct {
-	ID                 *int    `json:"id"`
-	Type               *string `json:"type"`
-	ClassTypeID        *int    `json:"class_type_id"`
-	OfficeID           *int    `json:"office_id"`
-	Search             *string `json:"search"`
-	ContractID         *int    `json:"contract_id"`
-	SourceType         *string `json:"source_type"`
-	DeprecationTypeID  *int    `json:"depreciation_type_id"`
-	ArticleID          *int    `json:"article_id"`
-	OrganizationUnitID *int    `json:"organization_unit_id"`
-	SerialNumber       *string `json:"serial_number"`
-	InventoryNumber    *string `json:"inventory_number"`
-	Location           *string `json:"location"`
-	Page               *int    `json:"page"`
-	Size               *int    `json:"size"`
+	ID                       *int    `json:"id"`
+	Type                     *string `json:"type"`
+	ClassTypeID              *int    `json:"class_type_id"`
+	OfficeID                 *int    `json:"office_id"`
+	Search                   *string `json:"search"`
+	ContractID               *int    `json:"contract_id"`
+	SourceType               *string `json:"source_type"`
+	DeprecationTypeID        *int    `json:"depreciation_type_id"`
+	ArticleID                *int    `json:"article_id"`
+	SourceOrganizationUnitID *int    `json:"source_organization_unit_id"`
+	OrganizationUnitID       *int    `json:"organization_unit_id"`
+	SerialNumber             *string `json:"serial_number"`
+	InventoryNumber          *string `json:"inventory_number"`
+	Location                 *string `json:"location"`
+	Page                     *int    `json:"page"`
+	Size                     *int    `json:"size"`
 }
 
 func ToItemListResponseDTO(items []*data.Item) []ItemResponseDTO {
