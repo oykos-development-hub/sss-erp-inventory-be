@@ -132,3 +132,26 @@ func (h *itemHandlerImpl) GetItemList(w http.ResponseWriter, r *http.Request) {
 
 	_ = h.App.WriteDataResponseWithTotal(w, http.StatusOK, "", res, int(*total))
 }
+
+func (h *itemHandlerImpl) GetItemListForReport(w http.ResponseWriter, r *http.Request) {
+	var input dto.ItemReportFilterDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	res, err := h.service.GetItemListForReport(input)
+	if err != nil {
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "Item updated successfuly", res)
+}

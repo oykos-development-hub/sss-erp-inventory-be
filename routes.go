@@ -24,6 +24,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Post("/items", handlers.ItemHandler.CreateItem)
 		rt.Get("/items/{id}", handlers.ItemHandler.GetItemById)
 		rt.Get("/items-in-organization-unit/{id}", handlers.ItemHandler.GetItemListInOrganizationUnit)
+		rt.Get("/items-for-item-list-report", handlers.ItemHandler.GetItemListForReport)
 		rt.Get("/items", handlers.ItemHandler.GetItemList)
 		rt.Put("/items/{id}", handlers.ItemHandler.UpdateItem)
 		rt.Delete("/items/{id}", handlers.ItemHandler.DeleteItem)

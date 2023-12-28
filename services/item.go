@@ -169,3 +169,13 @@ func (h *ItemServiceImpl) GetItemListInOrganizationUnit(id int) ([]data.ItemInOr
 
 	return data, nil
 }
+
+func (h *ItemServiceImpl) GetItemListForReport(input dto.ItemReportFilterDTO) ([]data.ItemReportResponse, error) {
+	data, err := h.repo.GetAllForReport(input.Type, input.SourceType, input.OrganizationUnitID, input.OfficeID, input.Date)
+	if err != nil {
+		h.App.ErrorLog.Println(err)
+		return nil, errors.ErrInternalServer
+	}
+
+	return data, nil
+}

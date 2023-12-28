@@ -206,3 +206,194 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 
 	return items, err
 }
+
+type ItemReportResponse struct {
+	ID                       int     `json:"id"`
+	Title                    string  `json:"title"`
+	SourceType               string  `json:"source_type"`
+	InventoryNumber          string  `json:"inventory_number"`
+	OfficeID                 int     `json:"office_id"`
+	SourceOrganizationUnitID int     `json:"source_organization_unit_id"`
+	TargetOrganizationUnitID int     `json:"target_organization_unit_id"`
+	ProcurementPrice         float32 `json:"procurement_price"`
+	LostValue                float32 `json:"lost_value"`
+	Price                    float32 `json:"price"`
+	Date                     string  `json:"date"`
+	DateOfPurchase           string  `json:"date_of_purchase"`
+}
+
+func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizationUnitID *int, officeID *int, date *string) ([]ItemReportResponse, error) {
+	var items []ItemReportResponse
+	//NS1 && PS1 items in moment 'date'
+	query1 := `SELECT i.id, i.type, i.is_external_donation
+	  FROM items i
+	  WHERE i.organization_unit_id = $1 and i.date_of_purchase < $2`
+
+	rows1, err := upper.SQL().Query(query1, *organizationUnitID, *date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows1.Close()
+
+	for rows1.Next() {
+		var item ItemReportResponse
+		var sourceTypeQuery string
+		var isDonation bool
+		err = rows1.Scan(&item.ID, &sourceTypeQuery, &isDonation)
+		if err != nil {
+			return nil, err
+		}
+		//checks was item donation
+		query3 := ` SELECT i.id
+		FROM items i, dispatches d, dispatch_items di
+		WHERE i.id = $1 and d.created_at > $2 and d.id = di.dispatch_id 
+		and d.type = 'convert' and di.inventory_id = i.id;`
+
+		rows3, err := upper.SQL().Query(query3, item.ID, *date)
+		if err != nil {
+			return nil, err
+		}
+		defer rows3.Close()
+
+		var donationID int
+
+		for rows3.Next() {
+			err = rows3.Scan(&donationID)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if sourceTypeQuery == "movable" {
+			if isDonation || donationID != 0 {
+				item.SourceType = "PS2"
+			} else {
+				item.SourceType = "PS1"
+			}
+		} else {
+			if isDonation || donationID != 0 {
+				item.SourceType = "NS2"
+			} else {
+				item.SourceType = "NS1"
+			}
+		}
+		if (sourceType == nil || *sourceType == item.SourceType) && (itemType != nil || *itemType == sourceTypeQuery) {
+			items = append(items, item)
+		}
+	}
+
+	//PS2 items in moment 'date'
+	query2 := `WITH RankedDispatches AS (
+		SELECT i.id, d.source_organization_unit_id
+		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
+		FROM items i
+		JOIN dispatch_items di ON i.id = di.inventory_id
+		JOIN dispatches d ON di.dispatch_id = d.id
+		WHERE ((d.type = 'revers' AND d.target_organization_unit_id = $1)
+		OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
+		  AND d.created_at < $2
+	  )
+	  SELECT id, type, source_organization_unit_id, target_organization_unit_id, created_at
+	  FROM RankedDispatches
+	  WHERE rn <= 1 and type = 'revers';`
+
+	rows2, err := upper.SQL().Query(query2, *organizationUnitID, *date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows2.Close()
+
+	for rows2.Next() {
+		var item ItemReportResponse
+		err = rows1.Scan(&item.ID, &item.SourceOrganizationUnitID)
+		if err != nil {
+			return nil, err
+		}
+		if (sourceType == nil || *sourceType == item.SourceType) && (itemType != nil || *itemType == "movable") {
+			items = append(items, item)
+		}
+	}
+
+	if officeID != nil {
+		var currentItems []ItemReportResponse
+
+		//checks office of item in moment date
+		query4 := `WITH RankedDispatches AS (
+			SELECT i.id,
+			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
+			FROM items i
+			JOIN dispatch_items di ON i.id = di.inventory_id
+			JOIN dispatches d ON di.dispatch_id = d.id
+			WHERE ((d.type = 'allocation' AND d.office_id = $1) OR d.type = 'return')
+			AND d.created_at < $2 AND i.id = $3)
+			  SELECT id, type, office_id, created_at
+			  FROM RankedDispatches
+			  WHERE rn <= 1 and type = 'allocation';`
+		for _, item := range items {
+			rows4, err := upper.SQL().Query(query4, *officeID, *date, item.ID)
+			if err != nil {
+				return nil, err
+			}
+			defer rows4.Close()
+
+			var itemID int
+			for rows4.Next() {
+				err = rows4.Scan(&itemID)
+				if err != nil {
+					return nil, err
+				}
+			}
+			if itemID != 0 {
+				currentItems = append(currentItems, item)
+			}
+		}
+		items = currentItems
+	}
+
+	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
+		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
+		FROM items i
+		JOIN assessments a ON i.id = a.inventory_id
+		WHERE (i.id, a.date_of_assessment, a.id) IN (
+		  SELECT i.id,  MAX(a.date_of_assessment) AS max_date, MAX(a.id) AS max_id
+		  FROM items i
+		  JOIN assessments a ON i.id = a.inventory_id
+		  WHERE a.date_of_assessment < $1 and i.id = $2
+		  GROUP BY i.id)
+		  LIMIT 1;`
+
+	for _, item := range items {
+		rows5, err := upper.SQL().Query(query5, *date, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer rows5.Close()
+
+		for rows5.Next() {
+			var estimatedDuration int
+			var dateOfAssessment string
+			err = rows5.Scan(&item.ID, &item.Title, &item.InventoryNumber, &item.ProcurementPrice,
+				&estimatedDuration, &dateOfAssessment, &item.DateOfPurchase)
+			if err != nil {
+				return nil, err
+			}
+			depreciationRate := 100 / estimatedDuration
+			monthlyDepreciationRate := float32(depreciationRate) / 12
+
+			dateOfAssessmentTime, err := time.Parse(time.RFC3339, dateOfAssessment)
+			if err != nil {
+				return nil, err
+			}
+			dateTime, err := time.Parse(time.RFC3339, *date)
+			if err != nil {
+				return nil, err
+			}
+			sub := dateTime.Sub(dateOfAssessmentTime)
+			months := float32(sub.Hours() / 24 / 30)
+
+			item.LostValue = item.ProcurementPrice - months*(item.ProcurementPrice*monthlyDepreciationRate/100)
+		}
+	}
+
+	return items, err
+}

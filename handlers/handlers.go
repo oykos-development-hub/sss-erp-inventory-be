@@ -28,6 +28,7 @@ type ItemHandler interface {
 	GetItemById(w http.ResponseWriter, r *http.Request)
 	GetItemList(w http.ResponseWriter, r *http.Request)
 	GetItemListInOrganizationUnit(w http.ResponseWriter, r *http.Request)
+	GetItemListForReport(w http.ResponseWriter, r *http.Request)
 }
 
 type AssessmentHandler interface {

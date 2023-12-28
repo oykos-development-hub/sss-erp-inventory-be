@@ -219,6 +219,14 @@ type InventoryItemFilter struct {
 	Size                     *int    `json:"size"`
 }
 
+type ItemReportFilterDTO struct {
+	Type               *string `json:"type"`
+	SourceType         *string `json:"source_type"`
+	OrganizationUnitID *int    `json:"organization_unit_id"`
+	OfficeID           *int    `json:"office_id"`
+	Date               *string `json:"date"`
+}
+
 func ToItemListResponseDTO(items []*data.Item) []ItemResponseDTO {
 	dtoList := make([]ItemResponseDTO, len(items))
 	for i, x := range items {

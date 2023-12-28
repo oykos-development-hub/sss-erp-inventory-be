@@ -27,6 +27,7 @@ type ItemService interface {
 	GetItem(id int) (*dto.ItemResponseDTO, error)
 	GetItemList(filter dto.InventoryItemFilter) ([]dto.ItemResponseDTO, *uint64, error)
 	GetItemListInOrganizationUnit(id int) ([]data.ItemInOrganizationUnit, error)
+	GetItemListForReport(input dto.ItemReportFilterDTO) ([]data.ItemReportResponse, error)
 }
 
 type AssessmentService interface {
