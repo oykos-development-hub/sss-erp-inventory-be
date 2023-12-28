@@ -285,7 +285,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//PS2 items in moment 'date'
 	query2 := `WITH RankedDispatches AS (
-		SELECT i.id, d.source_organization_unit_id
+		SELECT i.id, d.source_organization_unit_id, d.type,
 		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
 		FROM items i
 		JOIN dispatch_items di ON i.id = di.inventory_id
@@ -294,7 +294,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
 		  AND d.created_at < $2
 	  )
-	  SELECT id, type, source_organization_unit_id, target_organization_unit_id, created_at
+	  SELECT id, source_organization_unit_id
 	  FROM RankedDispatches
 	  WHERE rn <= 1 and type = 'revers';`
 
@@ -306,7 +306,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	for rows2.Next() {
 		var item ItemReportResponse
-		err = rows1.Scan(&item.ID, &item.SourceOrganizationUnitID)
+		err = rows2.Scan(&item.ID, &item.SourceOrganizationUnitID)
 		if err != nil {
 			return nil, err
 		}
