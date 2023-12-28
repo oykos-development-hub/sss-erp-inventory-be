@@ -310,46 +310,49 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		if err != nil {
 			return nil, err
 		}
-		if (sourceType == nil || *sourceType == item.SourceType) && (itemType != nil || *itemType == "movable") {
+		item.SourceType = "PS2"
+		if (sourceType == nil || (sourceType != nil && *sourceType == item.SourceType)) &&
+			(itemType == nil || (itemType != nil && *itemType == item.SourceType)) {
 			items = append(items, item)
 		}
 	}
 
-	if officeID != nil {
-		var currentItems []ItemReportResponse
-
-		//checks office of item in moment date
-		query4 := `WITH RankedDispatches AS (
-			SELECT i.id, d.type,
+	//checks office of item in moment date
+	query4 := `WITH RankedDispatches AS (
+			SELECT i.id, d.type, i.office_id,
 			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
 			FROM items i
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
 			WHERE ((d.type = 'allocation' AND d.office_id = $1) OR d.type = 'return')
 			AND d.created_at < $2 AND i.id = $3)
-			  SELECT id, type, office_id, created_at
+			  SELECT office_id
 			  FROM RankedDispatches
 			  WHERE rn <= 1 and type = 'allocation';`
-		for _, item := range items {
-			rows4, err := upper.SQL().Query(query4, *officeID, *date, item.ID)
+	var currentResponse []ItemReportResponse
+
+	for _, item := range items {
+		rows4, err := upper.SQL().Query(query4, *officeID, *date, item.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer rows4.Close()
+
+		var officeIDQuery int
+		for rows4.Next() {
+			err = rows4.Scan(&officeIDQuery)
 			if err != nil {
 				return nil, err
 			}
-			defer rows4.Close()
 
-			var itemID int
-			for rows4.Next() {
-				err = rows4.Scan(&itemID)
-				if err != nil {
-					return nil, err
-				}
-			}
-			if itemID != 0 {
-				currentItems = append(currentItems, item)
+			if officeID == nil || (officeID != nil && *officeID != officeIDQuery) {
+				item.OfficeID = officeIDQuery
+				currentResponse = append(currentResponse, item)
 			}
 		}
-		items = currentItems
 	}
+
+	items = currentResponse
 
 	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
 		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
@@ -390,9 +393,12 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				return nil, err
 			}
 			sub := dateTime.Sub(dateOfAssessmentTime)
-			months := float32(sub.Hours() / 24 / 30)
+			months := sub.Hours() / 24 / 30
 
-			items[i].Price = items[i].ProcurementPrice - months*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
+			items[i].Price = items[i].ProcurementPrice - float32(months)*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
+			if items[i].Price < 0 {
+				items[i].Price = 0
+			}
 			items[i].LostValue = items[i].ProcurementPrice - items[i].Price
 		}
 	}
