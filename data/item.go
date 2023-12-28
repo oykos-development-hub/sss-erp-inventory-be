@@ -277,7 +277,8 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				item.SourceType = "NS1"
 			}
 		}
-		if (sourceType == nil || *sourceType == item.SourceType) && (itemType != nil || *itemType == sourceTypeQuery) {
+		if (sourceType == nil || (sourceType != nil && *sourceType == item.SourceType)) &&
+			(itemType != nil || (itemType != nil && *itemType == sourceTypeQuery)) {
 			items = append(items, item)
 		}
 	}
