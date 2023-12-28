@@ -1,6 +1,8 @@
 package data
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/lib/pq"
@@ -283,6 +285,9 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		}
 	}
 
+	jsonData, _ := json.Marshal(items)
+	fmt.Println(string(jsonData))
+
 	//PS2 items in moment 'date'
 	query2 := `WITH RankedDispatches AS (
 		SELECT i.id, d.source_organization_unit_id, d.type,
@@ -314,6 +319,9 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			items = append(items, item)
 		}
 	}
+	fmt.Println("---------------------------------------------------------")
+	jsonData, _ = json.Marshal(items)
+	fmt.Println(string(jsonData))
 
 	if officeID != nil {
 		var currentItems []ItemReportResponse
