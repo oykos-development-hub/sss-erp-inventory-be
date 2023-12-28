@@ -357,8 +357,8 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
 		FROM items i
 		JOIN assessments a ON i.id = a.inventory_id
-		WHERE (i.id, a.date_of_assessment, a.id) IN (
-		  SELECT i.id,  MAX(a.date_of_assessment) AS max_date, MAX(a.id) AS max_id
+		WHERE (i.id, a.id) IN (
+		  SELECT i.id,  MAX(a.id) AS max_date
 		  FROM items i
 		  JOIN assessments a ON i.id = a.inventory_id
 		  WHERE a.date_of_assessment < $1 and i.id = $2
