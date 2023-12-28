@@ -393,8 +393,9 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			}
 			sub := dateTime.Sub(dateOfAssessmentTime)
 			months := sub.Hours() / 24 / 30
+			monthsInt := int(months)
 
-			items[i].Price = items[i].ProcurementPrice - float32(months)*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
+			items[i].Price = items[i].ProcurementPrice - float32(monthsInt)*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
 			if items[i].Price < 0 {
 				items[i].Price = 0
 			}
