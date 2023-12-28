@@ -319,16 +319,16 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//checks office of item in moment date
 	query4 := `WITH RankedDispatches AS (
-			SELECT i.id, d.type, i.office_id,
-			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
+			SELECT i.id, d.type, d.office_id, d.date
 			FROM items i
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
 			WHERE ((d.type = 'allocation') OR d.type = 'return')
-			AND date < $1 AND i.id = $2)
+			AND date < $1 AND i.id = $2
+			ORDER BY date DESC)
 			  SELECT office_id
 			  FROM RankedDispatches
-			  WHERE rn <= 1 and type = 'allocation';`
+			  LIMIT 1;`
 	var currentResponse []ItemReportResponse
 
 	for _, item := range items {
