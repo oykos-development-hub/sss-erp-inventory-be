@@ -324,15 +324,15 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			FROM items i
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
-			WHERE ((d.type = 'allocation' AND d.office_id = $1) OR d.type = 'return')
-			AND d.created_at < $2 AND i.id = $3)
+			WHERE ((d.type = 'allocation') OR d.type = 'return')
+			AND d.created_at < $1 AND i.id = $2)
 			  SELECT office_id
 			  FROM RankedDispatches
 			  WHERE rn <= 1 and type = 'allocation';`
 	var currentResponse []ItemReportResponse
 
 	for _, item := range items {
-		rows4, err := upper.SQL().Query(query4, *officeID, *date, item.ID)
+		rows4, err := upper.SQL().Query(query4, *date, item.ID)
 		if err != nil {
 			return nil, err
 		}
