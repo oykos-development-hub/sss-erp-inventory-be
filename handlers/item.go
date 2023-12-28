@@ -153,5 +153,5 @@ func (h *itemHandlerImpl) GetItemListForReport(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	_ = h.App.WriteDataResponse(w, http.StatusOK, "Item updated successfuly", res)
+	_ = h.App.WriteDataResponse(w, http.StatusOK, "You get report items successfuly", res)
 }
