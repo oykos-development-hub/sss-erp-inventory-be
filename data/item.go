@@ -246,7 +246,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		//checks was item donation
 		query3 := ` SELECT i.id
 		FROM items i, dispatches d, dispatch_items di
-		WHERE i.id = $1 and d.created_at > $2 and d.id = di.dispatch_id 
+		WHERE i.id = $1 and date > $2 and d.id = di.dispatch_id 
 		and d.type = 'convert' and di.inventory_id = i.id;`
 
 		rows3, err := upper.SQL().Query(query3, item.ID, *date)
@@ -286,13 +286,13 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	//PS2 items in moment 'date'
 	query2 := `WITH RankedDispatches AS (
 		SELECT i.id, d.source_organization_unit_id, d.type,
-		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
+		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
 		FROM items i
 		JOIN dispatch_items di ON i.id = di.inventory_id
 		JOIN dispatches d ON di.dispatch_id = d.id
 		WHERE ((d.type = 'revers' AND d.target_organization_unit_id = $1)
 		OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
-		  AND d.created_at < $2
+		  AND date < $2
 	  )
 	  SELECT id, source_organization_unit_id
 	  FROM RankedDispatches
@@ -320,12 +320,12 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	//checks office of item in moment date
 	query4 := `WITH RankedDispatches AS (
 			SELECT i.id, d.type, i.office_id,
-			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
+			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
 			FROM items i
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
 			WHERE ((d.type = 'allocation') OR d.type = 'return')
-			AND d.created_at < $1 AND i.id = $2)
+			AND date < $1 AND i.id = $2)
 			  SELECT office_id
 			  FROM RankedDispatches
 			  WHERE rn <= 1 and type = 'allocation';`
