@@ -345,7 +345,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				return nil, err
 			}
 
-			if officeID == nil || (officeID != nil && *officeID != officeIDQuery) {
+			if officeID == nil || (officeID != nil && *officeID == officeIDQuery) {
 				item.OfficeID = officeIDQuery
 				currentResponse = append(currentResponse, item)
 			}
