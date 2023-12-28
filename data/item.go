@@ -285,14 +285,14 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//PS2 items in moment 'date'
 	query2 := `WITH RankedDispatches AS (
-		SELECT i.id, d.source_organization_unit_id, d.type,
+		SELECT i.id, d.source_organization_unit_id, d.type, d.date,
 		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
 		FROM items i
 		JOIN dispatch_items di ON i.id = di.inventory_id
 		JOIN dispatches d ON di.dispatch_id = d.id
 		WHERE ((d.type = 'revers' AND d.target_organization_unit_id = $1)
 		OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
-		  AND date < $2
+		  AND d.date < $2
 	  )
 	  SELECT id, source_organization_unit_id
 	  FROM RankedDispatches
