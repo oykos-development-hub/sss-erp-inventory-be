@@ -320,7 +320,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 		//checks office of item in moment date
 		query4 := `WITH RankedDispatches AS (
-			SELECT i.id,
+			SELECT i.id, d.type,
 			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.created_at DESC) AS rn
 			FROM items i
 			JOIN dispatch_items di ON i.id = di.inventory_id
@@ -392,7 +392,8 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			sub := dateTime.Sub(dateOfAssessmentTime)
 			months := float32(sub.Hours() / 24 / 30)
 
-			items[i].LostValue = items[i].ProcurementPrice - months*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
+			items[i].Price = items[i].ProcurementPrice - months*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
+			items[i].LostValue = items[i].ProcurementPrice - items[i].Price
 		}
 	}
 
