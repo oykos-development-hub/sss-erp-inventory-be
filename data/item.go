@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/lib/pq"
@@ -364,8 +363,8 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		  GROUP BY i.id)
 		  LIMIT 1;`
 
-	for _, item := range items {
-		rows5, err := upper.SQL().Query(query5, *date, item.ID)
+	for i := 0; i < len(items); i++ {
+		rows5, err := upper.SQL().Query(query5, *date, items[i].ID)
 		if err != nil {
 			return nil, err
 		}
@@ -374,12 +373,11 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows5.Next() {
 			var estimatedDuration int
 			var dateOfAssessment string
-			err = rows5.Scan(&item.ID, &item.Title, &item.InventoryNumber, &item.ProcurementPrice,
-				&estimatedDuration, &dateOfAssessment, &item.DateOfPurchase)
+			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
+				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println(estimatedDuration, dateOfAssessment, item.ID)
 			depreciationRate := 100 / estimatedDuration
 			monthlyDepreciationRate := float32(depreciationRate) / 12
 
@@ -394,7 +392,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			sub := dateTime.Sub(dateOfAssessmentTime)
 			months := float32(sub.Hours() / 24 / 30)
 
-			item.LostValue = item.ProcurementPrice - months*(item.ProcurementPrice*monthlyDepreciationRate/100)
+			items[i].LostValue = items[i].ProcurementPrice - months*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
 		}
 	}
 
