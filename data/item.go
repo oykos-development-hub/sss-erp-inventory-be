@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/lib/pq"
@@ -136,6 +137,7 @@ func (t *Item) Insert(m Item) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 	collection := upper.Collection(t.Table())
+	fmt.Println("Office ID ", m.OfficeID)
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
