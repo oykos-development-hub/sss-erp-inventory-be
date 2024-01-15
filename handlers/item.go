@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,7 +40,7 @@ func (h *itemHandlerImpl) CreateItem(w http.ResponseWriter, r *http.Request) {
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
-
+	fmt.Printf("Objekat: %+v\n", input)
 	res, err := h.service.CreateItem(input)
 	if err != nil {
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
