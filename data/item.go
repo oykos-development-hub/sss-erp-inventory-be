@@ -164,7 +164,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
+		conditions = conditions + " and i.inventory_number = '" + *filter.InventoryNumber + "'"
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -188,7 +188,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
+		conditions = conditions + " and i.serial_number = '" + *filter.SerialNumber + "'"
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
@@ -197,15 +197,15 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.Search != nil {
-		conditions = conditions + " and (i.inventory_number = " + *filter.Search + " or i.title = " + *filter.Search + " )"
+		conditions = conditions + " and (i.inventory_number = '" + *filter.Search + "' or i.title = '" + *filter.Search + "' )"
 	}
 
 	if filter.Type != nil {
-		conditions = conditions + " and i.type = " + *filter.Type
+		conditions = conditions + " and i.type = '" + *filter.Type + "'"
 	}
 
 	if filter.TypeOfImmovableProperty != nil {
-		conditions = conditions + " and r.type = " + *filter.TypeOfImmovableProperty
+		conditions = conditions + " and r.type = '" + *filter.TypeOfImmovableProperty + "'"
 	}
 
 	if filter.Status != nil {
