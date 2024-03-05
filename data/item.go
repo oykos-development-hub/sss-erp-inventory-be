@@ -1,7 +1,7 @@
 package data
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/lib/pq"
@@ -56,6 +56,30 @@ type Item struct {
 	Owner                        *string       `db:"owner"`
 }
 
+type InventoryItemFilter struct {
+	ID                        *int    `json:"id"`
+	Type                      *string `json:"type"`
+	ClassTypeID               *int    `json:"class_type_id"`
+	OfficeID                  *int    `json:"office_id"`
+	Search                    *string `json:"search"`
+	ContractID                *int    `json:"contract_id"`
+	DeprecationTypeID         *int    `json:"depreciation_type_id"`
+	ArticleID                 *int    `json:"article_id"`
+	SourceOrganizationUnitID  *int    `json:"source_organization_unit_id"`
+	OrganizationUnitID        *int    `json:"organization_unit_id"`
+	SerialNumber              *string `json:"serial_number"`
+	InventoryNumber           *string `json:"inventory_number"`
+	Location                  *string `json:"location"`
+	Page                      *int    `json:"page"`
+	Size                      *int    `json:"size"` //dovde
+	CurrentOrganizationUnitID int     `json:"current_organization_unit_id"`
+	SourceType                *string `json:"source_type"`
+	IsExternalDonation        *bool   `json:"is_external_donation"`
+	Expire                    *bool   `json:"expire"`
+	Status                    *string `json:"status"`
+	TypeOfImmovableProperty   *string `json:"type_of_immovable_property"`
+}
+
 type ItemInOrganizationUnit struct {
 	ItemID      int   `json:"item_id"`
 	ReversID    int   `json:"revers_id"`
@@ -69,31 +93,162 @@ func (t *Item) Table() string {
 }
 
 // GetAll gets all records from the database, using upper
-func (t *Item) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Item, *uint64, error) {
-	collection := upper.Collection(t.Table())
-	var all []*Item
-	var res up.Result
+func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
+	var items []*Item
+	query := buildQuery(filter)
 
-	if condition != nil {
-		res = collection.Find(condition)
-	} else {
-		res = collection.Find()
-	}
-	total, err := res.Count()
+	rows, err := upper.SQL().Query(query)
 	if err != nil {
 		return nil, nil, err
 	}
+	defer rows.Close()
 
-	if page != nil && size != nil {
-		res = paginateResult(res, *page, *size)
+	for rows.Next() {
+		var itemID int
+		err = rows.Scan(&itemID)
+
+		item, err := t.Get(itemID)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		items = append(items, item)
 	}
 
-	err = res.OrderBy("created_at desc").All(&all)
-	if err != nil {
-		return nil, nil, err
+	total := uint64(2000)
+
+	return items, &total, err
+}
+
+func buildQuery(filter InventoryItemFilter) string {
+	selectPart := `SELECT i.id
+	FROM items i
+	LEFT JOIN (
+		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
+		FROM dispatches d
+		JOIN dispatch_items di ON d.id = di.dispatch_id
+		GROUP BY di.inventory_id
+	) AS max_dispatches ON i.id = max_dispatches.inventory_id
+	LEFT JOIN (
+		SELECT MAX(a.id) AS max_assessment_id, a.inventory_id AS inventory_id
+		FROM assessments a
+		GROUP BY a.inventory_id
+	) AS max_assessments ON i.id = max_assessments.inventory_id
+	LEFT JOIN dispatch_items di ON di.inventory_id = i.id
+	LEFT JOIN dispatches d ON d.id = di.dispatch_id
+	LEFT JOIN assessments a ON a.inventory_id = i.id
+	LEFT JOIN real_estates r ON r.inventory_id = i.id
+	WHERE (d.id IS NULL OR d.id = max_dispatches.max_dispatch_id)
+		AND (a.id IS NULL OR a.id = max_assessments.max_assessment_id)
+	 `
+	var conditions string
+
+	if filter.ArticleID != nil {
+		articleIDString := strconv.Itoa(*filter.ArticleID)
+		conditions = conditions + " and i.article_id = " + articleIDString
 	}
 
-	return all, &total, err
+	if filter.ClassTypeID != nil {
+		classTypeIDString := strconv.Itoa(*filter.ClassTypeID)
+		conditions = conditions + " and i.class_type_id = " + classTypeIDString
+	}
+
+	if filter.ContractID != nil {
+		contractIDString := strconv.Itoa(*filter.ContractID)
+		conditions = conditions + " and i.contract_id = " + contractIDString
+	}
+
+	if filter.DeprecationTypeID != nil {
+		depreciationTypeIDString := strconv.Itoa(*filter.DeprecationTypeID)
+		conditions = conditions + " and i.depreciation_type_id = " + depreciationTypeIDString
+	}
+
+	if filter.InventoryNumber != nil {
+		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
+	}
+
+	if filter.IsExternalDonation != nil {
+		var externalDonation string
+		if *filter.IsExternalDonation {
+			externalDonation = "true"
+		} else {
+			externalDonation = "false"
+		}
+		conditions = conditions + " and i.is_external_donation = " + externalDonation
+	}
+
+	if filter.OfficeID != nil {
+		officeIDString := strconv.Itoa(*filter.OfficeID)
+		conditions = conditions + " and i.office_id = " + officeIDString
+	}
+
+	if filter.OrganizationUnitID != nil {
+		organizationUnitIDString := strconv.Itoa(*filter.OrganizationUnitID)
+		conditions = conditions + " and (i.organization_unit_id = " + organizationUnitIDString + " or i.target_organization_unit_id = " + organizationUnitIDString + " )"
+	}
+
+	if filter.SerialNumber != nil {
+		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
+	}
+
+	if filter.SourceOrganizationUnitID != nil {
+		sourceOrganizationUnitIDString := strconv.Itoa(*filter.SourceOrganizationUnitID)
+		conditions = conditions + " and i.organization_unit_id = " + sourceOrganizationUnitIDString
+	}
+
+	if filter.Search != nil {
+		conditions = conditions + " and (i.inventory_number = " + *filter.Search + " or i.title = " + *filter.Search + " )"
+	}
+
+	if filter.Type != nil {
+		conditions = conditions + " and i.type = " + *filter.Type
+	}
+
+	if filter.TypeOfImmovableProperty != nil {
+		conditions = conditions + " and r.type = " + *filter.TypeOfImmovableProperty
+	}
+
+	if filter.Status != nil {
+		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+		switch *filter.Status {
+		case "Otpisano":
+			conditions = conditions + " and i.active = false "
+		case "Prihvaćeno":
+			conditions = conditions + " and ((i.target_organization_unit_id = " + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id " + currentOrganizationUnitIDString + " )) "
+		case "Zaduženo":
+			conditions = conditions + " and d.type = 'allocation' "
+		case "Povraćaj":
+			conditions = conditions + " and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
+		case "Nezaduženo":
+			conditions = conditions + " and not ((i.active = false) or ((i.target_organization_unit_id = " + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id " + currentOrganizationUnitIDString + " )) or (d.type = 'allocation') or (d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+		}
+	}
+
+	if filter.SourceType != nil {
+		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+		switch *filter.SourceType {
+		case "NS1":
+			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+		case "NS2":
+			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
+		case "PS1":
+			conditions = conditions + " and (i.type = 'movable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+		case "PS2":
+			conditions = conditions + " and (i.type = 'movable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
+		}
+	}
+
+	if filter.Expire != nil {
+		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration;"
+	}
+
+	if filter.Page != nil && filter.Size != nil {
+		pageString := strconv.Itoa(*filter.Page)
+		sizeString := strconv.Itoa(*filter.Size)
+		conditions = conditions + "order by id limit :" + sizeString + " offset (:" + pageString + " - 1) * :" + sizeString
+	}
+
+	return selectPart + conditions
 }
 
 // Get gets one record from the database, by id, using upper
@@ -137,7 +292,6 @@ func (t *Item) Insert(m Item) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
 	collection := upper.Collection(t.Table())
-	fmt.Println("Office ID ", m.OfficeID)
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err

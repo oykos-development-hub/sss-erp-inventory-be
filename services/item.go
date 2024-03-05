@@ -1,10 +1,6 @@
 package services
 
 import (
-	"fmt"
-
-	up "github.com/upper/db/v4"
-
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
 	"gitlab.sudovi.me/erp/inventory-api/errors"
@@ -83,74 +79,32 @@ func (h *ItemServiceImpl) GetItem(id int) (*dto.ItemResponseDTO, error) {
 }
 
 func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.ItemResponseDTO, *uint64, error) {
-	conditionAndExp := &up.AndExpr{}
 
-	if filter.ID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"id": *filter.ID})
+	filterOnData := data.InventoryItemFilter{
+		ID:                        filter.ID,
+		Type:                      filter.Type,
+		ClassTypeID:               filter.ClassTypeID,
+		OfficeID:                  filter.OfficeID,
+		Search:                    filter.Search,
+		ContractID:                filter.ContractID,
+		DeprecationTypeID:         filter.DeprecationTypeID,
+		ArticleID:                 filter.ArticleID,
+		SourceOrganizationUnitID:  filter.SourceOrganizationUnitID,
+		OrganizationUnitID:        filter.OrganizationUnitID,
+		SerialNumber:              filter.SerialNumber,
+		InventoryNumber:           filter.InventoryNumber,
+		Location:                  filter.Location,
+		Page:                      filter.Page,
+		Size:                      filter.Size,
+		CurrentOrganizationUnitID: filter.CurrentOrganizationUnitID,
+		SourceType:                filter.SourceType,
+		IsExternalDonation:        filter.IsExternalDonation,
+		Expire:                    filter.Expire,
+		Status:                    filter.Status,
+		TypeOfImmovableProperty:   filter.TypeOfImmovableProperty,
 	}
 
-	if filter.Type != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"type ILIKE": *filter.Type})
-	}
-
-	if filter.ClassTypeID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"class_type_id": *filter.ClassTypeID})
-	}
-
-	if filter.OfficeID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"office_id": *filter.OfficeID})
-	}
-
-	if filter.SourceType != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"source_type ILIKE": *filter.SourceType})
-	}
-
-	if filter.DeprecationTypeID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"depreciation_type_id": *filter.DeprecationTypeID})
-	}
-
-	if filter.ContractID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"contract_id": *filter.ContractID})
-	}
-
-	if filter.ArticleID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"article_id": *filter.ArticleID})
-	}
-
-	if filter.SerialNumber != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"serial_number": *filter.SerialNumber})
-	}
-
-	if filter.InventoryNumber != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"inventory_number": *filter.InventoryNumber})
-	}
-
-	if filter.Location != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"location": *filter.Location})
-	}
-
-	if filter.SourceOrganizationUnitID != nil {
-		conditionAndExp = up.And(conditionAndExp, &up.Cond{"organization_unit_id": *filter.SourceOrganizationUnitID})
-	}
-
-	if filter.OrganizationUnitID != nil {
-		orgUnit := up.Or(
-			up.Cond{"organization_unit_id": *filter.OrganizationUnitID},
-			up.Cond{"target_organization_unit_id": *filter.OrganizationUnitID},
-		)
-		conditionAndExp = up.And(conditionAndExp, orgUnit)
-	}
-
-	if filter.Search != nil {
-		likeCondition := fmt.Sprintf("%%%s%%", *filter.Search)
-		search := up.Or(
-			up.Cond{"title ILIKE": likeCondition},
-			up.Cond{"inventory_number ILIKE": likeCondition},
-		)
-		conditionAndExp = up.And(conditionAndExp, search)
-	}
-
-	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp)
+	data, total, err := h.repo.GetAll(filterOnData)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return nil, nil, errors.ErrInternalServer

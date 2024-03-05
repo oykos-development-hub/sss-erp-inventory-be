@@ -201,22 +201,27 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 }
 
 type InventoryItemFilter struct {
-	ID                       *int    `json:"id"`
-	Type                     *string `json:"type"`
-	ClassTypeID              *int    `json:"class_type_id"`
-	OfficeID                 *int    `json:"office_id"`
-	Search                   *string `json:"search"`
-	ContractID               *int    `json:"contract_id"`
-	SourceType               *string `json:"source_type"`
-	DeprecationTypeID        *int    `json:"depreciation_type_id"`
-	ArticleID                *int    `json:"article_id"`
-	SourceOrganizationUnitID *int    `json:"source_organization_unit_id"`
-	OrganizationUnitID       *int    `json:"organization_unit_id"`
-	SerialNumber             *string `json:"serial_number"`
-	InventoryNumber          *string `json:"inventory_number"`
-	Location                 *string `json:"location"`
-	Page                     *int    `json:"page"`
-	Size                     *int    `json:"size"`
+	ID                        *int    `json:"id"`
+	Type                      *string `json:"type"`
+	ClassTypeID               *int    `json:"class_type_id"`
+	OfficeID                  *int    `json:"office_id"`
+	Search                    *string `json:"search"`
+	ContractID                *int    `json:"contract_id"`
+	DeprecationTypeID         *int    `json:"depreciation_type_id"`
+	ArticleID                 *int    `json:"article_id"`
+	SourceOrganizationUnitID  *int    `json:"source_organization_unit_id"`
+	OrganizationUnitID        *int    `json:"organization_unit_id"`
+	SerialNumber              *string `json:"serial_number"`
+	InventoryNumber           *string `json:"inventory_number"`
+	Location                  *string `json:"location"`
+	Page                      *int    `json:"page"`
+	Size                      *int    `json:"size"` //dovde
+	CurrentOrganizationUnitID int     `json:"current_organization_unit_id"`
+	SourceType                *string `json:"source_type"`
+	IsExternalDonation        *bool   `json:"is_external_donation"`
+	Expire                    *bool   `json:"expire"`
+	Status                    *string `json:"status"`
+	TypeOfImmovableProperty   *string `json:"type_of_immovable_property"`
 }
 
 type ItemReportFilterDTO struct {
