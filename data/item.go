@@ -220,9 +220,9 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Zaduženo":
 			conditions = conditions + " and d.type = 'allocation' "
 		case "Povraćaj":
-			conditions = conditions + " and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
+			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
 		}
 	}
 
