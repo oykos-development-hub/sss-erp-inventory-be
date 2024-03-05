@@ -245,7 +245,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	if filter.Page != nil && filter.Size != nil {
 		pageString := strconv.Itoa(*filter.Page)
 		sizeString := strconv.Itoa(*filter.Size)
-		conditions = conditions + "order by id limit :" + sizeString + " offset (:" + pageString + " - 1) * :" + sizeString
+		conditions = conditions + "order by id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
 	}
 
 	return selectPart + conditions
