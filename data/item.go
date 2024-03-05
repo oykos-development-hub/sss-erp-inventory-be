@@ -239,7 +239,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.Expire != nil {
-		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration;"
+		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
 	if filter.Page != nil && filter.Size != nil {
