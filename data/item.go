@@ -232,11 +232,11 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "NS1":
 			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
 		case "NS2":
-			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
+			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = false)) "
 		case "PS1":
 			conditions = conditions + " and (i.type = 'movable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
 		case "PS2":
-			conditions = conditions + " and (i.type = 'movable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
+			conditions = conditions + " and (i.type = 'movable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = false)) "
 		}
 	}
 
