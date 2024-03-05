@@ -137,7 +137,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	LEFT JOIN dispatch_items di ON di.inventory_id = i.id
 	LEFT JOIN dispatches d ON d.id = di.dispatch_id
 	LEFT JOIN assessments a ON a.inventory_id = i.id
-	LEFT JOIN real_estates r ON r.inventory_id = i.id
+	LEFT JOIN real_estates r ON r.item_id = i.id
 	WHERE (d.id IS NULL OR d.id = max_dispatches.max_dispatch_id)
 		AND (a.id IS NULL OR a.id = max_assessments.max_assessment_id)
 	 `
