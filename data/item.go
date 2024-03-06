@@ -105,8 +105,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 
 	for rows.Next() {
 		var itemID int
-		var count int
-		err = rows.Scan(&itemID, &count)
+		err = rows.Scan(&itemID)
 
 		if err != nil {
 			return nil, nil, err
@@ -130,9 +129,8 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 
 	var total uint64
 	for rows.Next() {
-		var itemID int
 		var count int
-		err = rows.Scan(&itemID, &count)
+		err = rows.Scan(&count)
 
 		if err != nil {
 			return nil, nil, err
