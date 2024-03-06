@@ -105,7 +105,12 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 
 	for rows.Next() {
 		var itemID int
-		err = rows.Scan(&itemID)
+		var count int
+		err = rows.Scan(&itemID, &count)
+
+		if err != nil {
+			return nil, nil, err
+		}
 
 		item, err := t.Get(itemID)
 		if err != nil {
@@ -115,13 +120,37 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		items = append(items, item)
 	}
 
-	total := uint64(2000)
+	filter.Page = nil
+	filter.Size = nil
+	query = buildQuery(filter)
+
+	rows, err = upper.SQL().Query(query)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var total uint64
+	for rows.Next() {
+		var itemID int
+		var count int
+		err = rows.Scan(&itemID, &count)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		total = uint64(count)
+		if total > 0 {
+			break
+		}
+	}
 
 	return items, &total, err
 }
 
 func buildQuery(filter InventoryItemFilter) string {
-	selectPart := `SELECT i.id
+	selectPart := `SELECT i.id, count(*)
 	FROM items i
 	LEFT JOIN (
 		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
@@ -223,7 +252,11 @@ func buildQuery(filter InventoryItemFilter) string {
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
 			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+			/*case "Arhiva":
+			conditions = conditions + */
+
 		}
+
 	}
 
 	if filter.SourceType != nil {
