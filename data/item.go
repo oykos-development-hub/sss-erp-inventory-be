@@ -277,6 +277,8 @@ func buildQuery(filter InventoryItemFilter) string {
 		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
+	conditions = conditions + " group by i.id "
+
 	if filter.Page != nil && filter.Size != nil {
 		pageString := strconv.Itoa(*filter.Page)
 		sizeString := strconv.Itoa(*filter.Size)
