@@ -120,9 +120,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		items = append(items, item)
 	}
 
-	filter.Page = nil
-	filter.Size = nil
-	query = buildQuery(filter)
+	query = buildQueryForTotal(filter)
 
 	rows, err = upper.SQL().Query(query)
 	if err != nil {
@@ -141,16 +139,14 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		}
 
 		total = uint64(count)
-		if total > 0 {
-			break
-		}
+
 	}
 
 	return items, &total, err
 }
 
 func buildQuery(filter InventoryItemFilter) string {
-	selectPart := `SELECT i.id, count(*)
+	selectPart := `SELECT i.id
 	FROM items i
 	LEFT JOIN (
 		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
@@ -277,12 +273,141 @@ func buildQuery(filter InventoryItemFilter) string {
 		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
-	conditions = conditions + " group by i.id "
-
 	if filter.Page != nil && filter.Size != nil {
 		pageString := strconv.Itoa(*filter.Page)
 		sizeString := strconv.Itoa(*filter.Size)
 		conditions = conditions + "order by id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
+	}
+
+	return selectPart + conditions
+}
+
+func buildQueryForTotal(filter InventoryItemFilter) string {
+	selectPart := `SELECT count(*)
+	FROM items i
+	LEFT JOIN (
+		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
+		FROM dispatches d
+		JOIN dispatch_items di ON d.id = di.dispatch_id
+		GROUP BY di.inventory_id
+	) AS max_dispatches ON i.id = max_dispatches.inventory_id
+	LEFT JOIN (
+		SELECT MAX(a.id) AS max_assessment_id, a.inventory_id AS inventory_id
+		FROM assessments a
+		GROUP BY a.inventory_id
+	) AS max_assessments ON i.id = max_assessments.inventory_id
+	LEFT JOIN dispatch_items di ON di.inventory_id = i.id
+	LEFT JOIN dispatches d ON d.id = di.dispatch_id
+	LEFT JOIN assessments a ON a.inventory_id = i.id
+	LEFT JOIN real_estates r ON r.item_id = i.id
+	WHERE (d.id IS NULL OR d.id = max_dispatches.max_dispatch_id)
+		AND (a.id IS NULL OR a.id = max_assessments.max_assessment_id)
+	 `
+	var conditions string
+
+	if filter.ArticleID != nil {
+		articleIDString := strconv.Itoa(*filter.ArticleID)
+		conditions = conditions + " and i.article_id = " + articleIDString
+	}
+
+	if filter.ClassTypeID != nil {
+		classTypeIDString := strconv.Itoa(*filter.ClassTypeID)
+		conditions = conditions + " and i.class_type_id = " + classTypeIDString
+	}
+
+	if filter.ContractID != nil {
+		contractIDString := strconv.Itoa(*filter.ContractID)
+		conditions = conditions + " and i.contract_id = " + contractIDString
+	}
+
+	if filter.DeprecationTypeID != nil {
+		depreciationTypeIDString := strconv.Itoa(*filter.DeprecationTypeID)
+		conditions = conditions + " and i.depreciation_type_id = " + depreciationTypeIDString
+	}
+
+	if filter.InventoryNumber != nil {
+		conditions = conditions + " and i.inventory_number = '" + *filter.InventoryNumber + "'"
+	}
+
+	if filter.IsExternalDonation != nil {
+		var externalDonation string
+		if *filter.IsExternalDonation {
+			externalDonation = "true"
+		} else {
+			externalDonation = "false"
+		}
+		conditions = conditions + " and i.is_external_donation = " + externalDonation
+	}
+
+	if filter.OfficeID != nil {
+		officeIDString := strconv.Itoa(*filter.OfficeID)
+		conditions = conditions + " and i.office_id = " + officeIDString
+	}
+
+	if filter.OrganizationUnitID != nil {
+		organizationUnitIDString := strconv.Itoa(*filter.OrganizationUnitID)
+		conditions = conditions + " and (i.organization_unit_id = " + organizationUnitIDString + " or i.target_organization_unit_id = " + organizationUnitIDString + " )"
+	}
+
+	if filter.SerialNumber != nil {
+		conditions = conditions + " and i.serial_number = '" + *filter.SerialNumber + "'"
+	}
+
+	if filter.SourceOrganizationUnitID != nil {
+		sourceOrganizationUnitIDString := strconv.Itoa(*filter.SourceOrganizationUnitID)
+		conditions = conditions + " and i.organization_unit_id = " + sourceOrganizationUnitIDString
+	}
+
+	if filter.Search != nil {
+		conditions = conditions + " and (i.inventory_number = '" + *filter.Search + "' or i.title = '" + *filter.Search + "' )"
+	}
+
+	if filter.Type != nil {
+		conditions = conditions + " and i.type = '" + *filter.Type + "'"
+	}
+
+	if filter.TypeOfImmovableProperty != nil {
+		conditions = conditions + " and r.type = '" + *filter.TypeOfImmovableProperty + "'"
+	}
+
+	if filter.Status != nil {
+		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+		switch *filter.Status {
+		case "Otpisano":
+			conditions = conditions + " and i.active = false "
+		case "Prihvaćeno":
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
+		case "Poslato":
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
+		case "Zaduženo":
+			conditions = conditions + " and d.type = 'allocation' "
+		case "Povraćaj":
+			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
+		case "Nezaduženo":
+			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+			/*case "Arhiva":
+			conditions = conditions + */
+
+		}
+
+	}
+
+	if filter.SourceType != nil {
+		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+		switch *filter.SourceType {
+		case "NS1":
+			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+		case "NS2":
+			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = false)) "
+		case "PS1":
+			conditions = conditions + " and (i.type = 'movable' and (i.organization_unit_id = i.target_organization_unit_id or i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+		case "PS2":
+			conditions = conditions + " and (i.type = 'movable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = false)) "
+		}
+	}
+
+	if filter.Expire != nil {
+		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
 	return selectPart + conditions
