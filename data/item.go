@@ -245,7 +245,12 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+			conditions = conditions + `and (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` or i.organization_unit_id = ` + currentOrganizationUnitIDString + `) 
+			and not ((i.active = false) 
+			or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id = ` + currentOrganizationUnitIDString +
+				` ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  = ` + currentOrganizationUnitIDString +
+				` ))  or (d.type = 'allocation') 
+			or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = ` + currentOrganizationUnitIDString + "))"
 		case "Arhiva":
 			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
 			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
@@ -382,15 +387,20 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Otpisano":
 			conditions = conditions + " and i.active = false "
 		case "Prihvaćeno":
-			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id = " + currentOrganizationUnitIDString + " ) "
 		case "Poslato":
-			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id = " + currentOrganizationUnitIDString + " ) "
 		case "Zaduženo":
 			conditions = conditions + " and d.type = 'allocation' "
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
+			conditions = conditions + ` and (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` or i.organization_unit_id = ` + currentOrganizationUnitIDString + `) 
+										and not ((i.active = false) 
+										or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id = ` + currentOrganizationUnitIDString +
+				` ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  = ` + currentOrganizationUnitIDString +
+				` ))  or (d.type = 'allocation') 
+								        or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = ` + currentOrganizationUnitIDString + "))"
 		case "Arhiva":
 			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
 			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
