@@ -255,7 +255,7 @@ func buildQuery(filter InventoryItemFilter) string {
 				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
 				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
 				AND di2.inventory_id = di.inventory_id
-			) and d1.target_organization_unit_id = 162;) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
+			) and d1.target_organization_unit_id = 162) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
 
 		}
 
@@ -400,7 +400,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
 				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
 				AND di2.inventory_id = di.inventory_id
-			) and d1.target_organization_unit_id = 162;) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
+			) and d1.target_organization_unit_id = 162) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
 
 		}
 
