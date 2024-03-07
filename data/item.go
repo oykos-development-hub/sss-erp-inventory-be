@@ -246,8 +246,16 @@ func buildQuery(filter InventoryItemFilter) string {
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
 			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
-			/*case "Arhiva":
-			conditions = conditions + */
+		case "Arhiva":
+			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
+			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+			WHERE EXISTS (
+				SELECT 1
+				FROM dispatches d2
+				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
+				AND di2.inventory_id = di.inventory_id
+			) and d1.target_organization_unit_id = 162;) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
 
 		}
 
@@ -383,8 +391,16 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
 			conditions = conditions + " and not ((i.active = false) or (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) or (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id  =" + currentOrganizationUnitIDString + " ))  or (d.type = 'allocation') or (d.is_accepted = false and d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString + "))"
-			/*case "Arhiva":
-			conditions = conditions + */
+		case "Arhiva":
+			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
+			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+			WHERE EXISTS (
+				SELECT 1
+				FROM dispatches d2
+				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
+				AND di2.inventory_id = di.inventory_id
+			) and d1.target_organization_unit_id = 162;) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
 
 		}
 
