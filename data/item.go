@@ -144,7 +144,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 }
 
 func buildQuery(filter InventoryItemFilter) string {
-	selectPart := `SELECT i.id
+	selectPart := `SELECT count(*)
 	FROM items i
 	LEFT JOIN (
 		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
@@ -246,17 +246,22 @@ func buildQuery(filter InventoryItemFilter) string {
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
-			or(i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
+			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		case "Arhiva":
-			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
-			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
-			WHERE EXISTS (
+			conditions = conditions + ` and EXISTS (
 				SELECT 1
-				FROM dispatches d2
-				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
-				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
-				AND di2.inventory_id = di.inventory_id
-			) and d1.target_organization_unit_id = 162) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
+				FROM dispatch_items di
+				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+				WHERE EXISTS (
+					SELECT 1
+					FROM dispatches d2
+					JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+					WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
+					AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + `
+				) 
+				AND di.inventory_id = i.id
+			) 
+			AND i.target_organization_unit_id <> ` + currentOrganizationUnitIDString
 
 		}
 
@@ -394,15 +399,20 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or(i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		case "Arhiva":
-			conditions = conditions + ` and (i.id EXISTS IN (SELECT di.inventory_id FROM dispatch_items di
-			JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
-			WHERE EXISTS (
+			conditions = conditions + ` and EXISTS (
 				SELECT 1
-				FROM dispatches d2
-				JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
-				WHERE d2.type = 'return-revers' AND d2.is_accepted = true and d1.target_organization_unit_id = d2.source_organization_unit_id 
-				AND di2.inventory_id = di.inventory_id
-			) and d1.target_organization_unit_id = 162) and i.target_organization_unit_id <> ` + currentOrganizationUnitIDString + ") "
+				FROM dispatch_items di
+				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+				WHERE EXISTS (
+					SELECT 1
+					FROM dispatches d2
+					JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+					WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
+					AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + `
+				) 
+				AND di.inventory_id = i.id
+			) 
+			AND i.target_organization_unit_id <> ` + currentOrganizationUnitIDString
 
 		}
 
