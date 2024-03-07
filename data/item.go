@@ -248,7 +248,7 @@ func buildQuery(filter InventoryItemFilter) string {
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		case "Arhiva":
-			conditions = conditions + ` and EXISTS (
+			conditions = ` and EXISTS (
 				SELECT 1
 				FROM dispatch_items di
 				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
@@ -399,7 +399,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or(i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		case "Arhiva":
-			conditions = conditions + ` and EXISTS (
+			conditions = ` and EXISTS (
 				SELECT 1
 				FROM dispatch_items di
 				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
