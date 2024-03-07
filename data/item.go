@@ -144,7 +144,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 }
 
 func buildQuery(filter InventoryItemFilter) string {
-	selectPart := `SELECT count(*)
+	selectPart := `SELECT i.id
 	FROM items i
 	LEFT JOIN (
 		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
@@ -288,7 +288,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	if filter.Page != nil && filter.Size != nil {
 		pageString := strconv.Itoa(*filter.Page)
 		sizeString := strconv.Itoa(*filter.Size)
-		conditions = conditions + "order by id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
+		conditions = conditions + "order by i.id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
 	}
 
 	return selectPart + conditions
