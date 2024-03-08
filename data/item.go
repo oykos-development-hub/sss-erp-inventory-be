@@ -95,8 +95,13 @@ func (t *Item) Table() string {
 // GetAll gets all records from the database, using upper
 func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 	var items []*Item
-	query := buildQuery(filter)
+	var query string
 
+	if filter.Status != nil && *filter.Status == "Arhiva" {
+		query = buildQueryForArchive(filter)
+	} else {
+		query = buildQuery(filter)
+	}
 	rows, err := upper.SQL().Query(query)
 	if err != nil {
 		return nil, nil, err
@@ -119,7 +124,11 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		items = append(items, item)
 	}
 
-	query = buildQueryForTotal(filter)
+	if filter.Status != nil && *filter.Status == "Arhiva" {
+		query = buildQueryForArchiveTotal(filter)
+	} else {
+		query = buildQueryForTotal(filter)
+	}
 
 	rows, err = upper.SQL().Query(query)
 	if err != nil {
@@ -247,22 +256,6 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Nezaduženo":
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
-		case "Arhiva":
-			conditions = ` and EXISTS (
-				SELECT 1
-				FROM dispatch_items di
-				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
-				WHERE EXISTS (
-					SELECT 1
-					FROM dispatches d2
-					JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
-					WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
-					AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + `
-				) 
-				AND di.inventory_id = i.id
-			) 
-			AND i.target_organization_unit_id <> ` + currentOrganizationUnitIDString
-
 		}
 
 	}
@@ -292,6 +285,38 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	return selectPart + conditions
+}
+
+func buildQueryForArchive(filter InventoryItemFilter) string {
+	currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+	query := `SELECT di.inventory_id
+	FROM dispatch_items di
+	JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+	WHERE EXISTS (
+		SELECT 1
+		FROM dispatches d2
+		JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+		WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
+		AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` 
+	) `
+
+	return query
+}
+
+func buildQueryForArchiveTotal(filter InventoryItemFilter) string {
+	currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
+	query := `SELECT count(*)
+	FROM dispatch_items di
+	JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
+	WHERE EXISTS (
+		SELECT 1
+		FROM dispatches d2
+		JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
+		WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
+		AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` 
+	) `
+
+	return query
 }
 
 func buildQueryForTotal(filter InventoryItemFilter) string {
@@ -398,22 +423,6 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Nezaduženo":
 			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or(i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
-		case "Arhiva":
-			conditions = ` and EXISTS (
-				SELECT 1
-				FROM dispatch_items di
-				JOIN dispatches d1 ON di.dispatch_id = d1.id AND d1.type = 'revers'
-				WHERE EXISTS (
-					SELECT 1
-					FROM dispatches d2
-					JOIN dispatch_items di2 ON d2.id = di2.dispatch_id
-					WHERE d2.type = 'return-revers' AND d2.is_accepted = true AND d1.target_organization_unit_id = d2.source_organization_unit_id 
-					AND di2.inventory_id = di.inventory_id and d1.target_organization_unit_id = ` + currentOrganizationUnitIDString + `
-				) 
-				AND di.inventory_id = i.id
-			) 
-			AND i.target_organization_unit_id <> ` + currentOrganizationUnitIDString
-
 		}
 
 	}
