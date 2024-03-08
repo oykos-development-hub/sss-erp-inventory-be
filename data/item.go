@@ -237,7 +237,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.TypeOfImmovableProperty != nil {
-		conditions = conditions + " and r.type = '" + *filter.TypeOfImmovableProperty + "'"
+		conditions = conditions + " and r.type_id = '" + *filter.TypeOfImmovableProperty + "'"
 	}
 
 	if filter.Status != nil {
@@ -404,7 +404,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.TypeOfImmovableProperty != nil {
-		conditions = conditions + " and r.type = '" + *filter.TypeOfImmovableProperty + "'"
+		conditions = conditions + " and r.type_id = '" + *filter.TypeOfImmovableProperty + "'"
 	}
 
 	if filter.Status != nil {
