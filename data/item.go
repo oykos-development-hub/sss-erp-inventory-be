@@ -254,7 +254,7 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
+			conditions = conditions + ` and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
 			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		}
 
@@ -264,9 +264,9 @@ func buildQuery(filter InventoryItemFilter) string {
 		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
 		switch *filter.SourceType {
 		case "NS1":
-			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " and i.is_external_donation = false))"
 		case "NS2":
-			conditions = conditions + " and (i.type = 'immovable' and i.target_organization_unit_id = " + currentOrganizationUnitIDString + ") "
+			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
 		case "PS1":
 			conditions = conditions + " and (i.type = 'movable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
 		case "PS2":
