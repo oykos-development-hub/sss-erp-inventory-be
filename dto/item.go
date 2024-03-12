@@ -49,6 +49,7 @@ type ItemDTO struct {
 	PriceOfAssessment            *int          `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int          `json:"lifetime_of_assessment_in_months"`
 	Owner                        *string       `json:"owner"`
+	AssessmentPrice              *float32      `json:"assessment_price"`
 }
 
 type ItemResponseDTO struct {
@@ -96,6 +97,7 @@ type ItemResponseDTO struct {
 	FileID                       *int       `json:"file_id"`
 	DeactivationFileID           *int       `json:"deactivation_file_id"`
 	Owner                        *string    `json:"owner"`
+	AssessmentPrice              *float32   `json:"assessment_price"`
 }
 
 func (dto ItemDTO) ToItem() *data.Item {
@@ -141,6 +143,7 @@ func (dto ItemDTO) ToItem() *data.Item {
 		DonationDescription:          dto.DonationDescription,
 		DonationFiles:                dto.DonationFiles,
 		Owner:                        dto.Owner,
+		AssessmentPrice:              dto.AssessmentPrice,
 	}
 }
 
@@ -197,6 +200,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		DonationDescription:          data.DonationDescription,
 		DonationFiles:                donationFiles,
 		Owner:                        data.Owner,
+		AssessmentPrice:              data.AssessmentPrice,
 	}
 }
 
@@ -215,7 +219,7 @@ type InventoryItemFilter struct {
 	InventoryNumber           *string `json:"inventory_number"`
 	Location                  *string `json:"location"`
 	Page                      *int    `json:"page"`
-	Size                      *int    `json:"size"` //dovde
+	Size                      *int    `json:"size"`
 	CurrentOrganizationUnitID int     `json:"current_organization_unit_id"`
 	SourceType                *string `json:"source_type"`
 	IsExternalDonation        *bool   `json:"is_external_donation"`

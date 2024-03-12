@@ -33,6 +33,7 @@ type Item struct {
 	Amount                       int           `db:"amount"`
 	NetPrice                     *float32      `db:"net_price"`
 	GrossPrice                   float32       `db:"gross_price"`
+	AssessmentPrice *float32 `db:"assessment_price"`
 	Description                  *string       `db:"description"`
 	DateOfPurchase               time.Time     `db:"date_of_purchase"`
 	Inactive                     *time.Time    `db:"inactive"`
@@ -71,7 +72,7 @@ type InventoryItemFilter struct {
 	InventoryNumber           *string `json:"inventory_number"`
 	Location                  *string `json:"location"`
 	Page                      *int    `json:"page"`
-	Size                      *int    `json:"size"` //dovde
+	Size                      *int    `json:"size"` 
 	CurrentOrganizationUnitID int     `json:"current_organization_unit_id"`
 	SourceType                *string `json:"source_type"`
 	IsExternalDonation        *bool   `json:"is_external_donation"`
