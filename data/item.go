@@ -33,7 +33,7 @@ type Item struct {
 	Amount                       int           `db:"amount"`
 	NetPrice                     *float32      `db:"net_price"`
 	GrossPrice                   float32       `db:"gross_price"`
-	AssessmentPrice *float32 `db:"assessment_price"`
+	AssessmentPrice              *float32      `db:"assessment_price"`
 	Description                  *string       `db:"description"`
 	DateOfPurchase               time.Time     `db:"date_of_purchase"`
 	Inactive                     *time.Time    `db:"inactive"`
@@ -72,7 +72,7 @@ type InventoryItemFilter struct {
 	InventoryNumber           *string `json:"inventory_number"`
 	Location                  *string `json:"location"`
 	Page                      *int    `json:"page"`
-	Size                      *int    `json:"size"` 
+	Size                      *int    `json:"size"`
 	CurrentOrganizationUnitID int     `json:"current_organization_unit_id"`
 	SourceType                *string `json:"source_type"`
 	IsExternalDonation        *bool   `json:"is_external_donation"`
@@ -364,7 +364,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number = '" + *filter.InventoryNumber + "'"
+		conditions = conditions + " and i.inventory_number like '" + *filter.InventoryNumber + "%'"
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -388,7 +388,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number = '" + *filter.SerialNumber + "'"
+		conditions = conditions + " and i.serial_number like '" + *filter.SerialNumber + "%'"
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
@@ -397,7 +397,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.Search != nil {
-		conditions = conditions + " and (i.inventory_number = '" + *filter.Search + "' or i.title = '" + *filter.Search + "' )"
+		conditions = conditions + " and (i.inventory_number like '" + *filter.Search + "%' or i.title like '" + *filter.Search + "%' )"
 	}
 
 	if filter.Type != nil {
@@ -414,16 +414,16 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Otpisano":
 			conditions = conditions + " and i.active = false "
 		case "Prihvaćeno":
-			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id = " + currentOrganizationUnitIDString + " ) "
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = true and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
 		case "Poslato":
-			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id = " + currentOrganizationUnitIDString + " ) "
+			conditions = conditions + " and (d.type = 'revers' and d.is_accepted = false and i.organization_unit_id =" + currentOrganizationUnitIDString + " ) "
 		case "Zaduženo":
 			conditions = conditions + " and d.type = 'allocation' "
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + `and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
-			or(i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
+			conditions = conditions + ` and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
+			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
 		}
 
 	}
@@ -432,18 +432,24 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		currentOrganizationUnitIDString := strconv.Itoa(filter.CurrentOrganizationUnitID)
 		switch *filter.SourceType {
 		case "NS1":
-			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
+			conditions = conditions + " and (i.type = 'immovable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " and i.is_external_donation = false))"
 		case "NS2":
-			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + ")) "
+			conditions = conditions + " and (i.type = 'immovable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + " or i.is_external_donation = true)) "
 		case "PS1":
 			conditions = conditions + " and (i.type = 'movable' and (i.organization_unit_id = " + currentOrganizationUnitIDString + " ))"
 		case "PS2":
-			conditions = conditions + " and (i.type = 'movable' and (i.target_organization_unit_id = " + currentOrganizationUnitIDString + ")) "
+			conditions = conditions + " and (i.type = 'movable' and i.target_organization_unit_id = " + currentOrganizationUnitIDString + ") "
 		}
 	}
 
 	if filter.Expire != nil {
 		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
+	}
+
+	if filter.Page != nil && filter.Size != nil {
+		pageString := strconv.Itoa(*filter.Page)
+		sizeString := strconv.Itoa(*filter.Size)
+		conditions = conditions + "order by i.id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
 	}
 
 	return selectPart + conditions
