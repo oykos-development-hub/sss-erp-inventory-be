@@ -446,13 +446,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
-	if filter.Page != nil && filter.Size != nil {
-		pageString := strconv.Itoa(*filter.Page)
-		sizeString := strconv.Itoa(*filter.Size)
-		conditions = conditions + "order by i.id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
-	}
-
-	return selectPart + conditions
+	return selectPart + conditions + " group by i.id"
 }
 
 // Get gets one record from the database, by id, using upper
