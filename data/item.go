@@ -678,7 +678,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
 			WHERE (d.type = 'allocation' OR d.type = 'return' OR d.type='created')
-			AND date < $1 AND i.id = $2
+			AND date < '2024-01-01' AND i.id = 33571
 			ORDER BY date DESC)
 			  SELECT office_id
 			  FROM RankedDispatches
@@ -707,8 +707,9 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	items = currentResponse
 
+	//makni obavezno office_id - zakucavanje da rade ove popisne liste njihove
 	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
-		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
+		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase, i.office_id, i.assessment_value
 		FROM items i
 		JOIN assessments a ON i.id = a.inventory_id
 		WHERE (i.id, a.id) IN (
@@ -730,11 +731,11 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			var estimatedDuration int
 			var dateOfAssessment string
 			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
-				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
+				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase, &items[i].OfficeID, &items[i].LostValue)
 			if err != nil {
 				return nil, err
 			}
-			depreciationRate := 100 / estimatedDuration
+			/*depreciationRate := 100 / estimatedDuration
 			monthlyDepreciationRate := float32(depreciationRate) / 12
 
 			dateOfAssessmentTime, err := time.Parse(time.RFC3339, dateOfAssessment)
@@ -753,7 +754,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			if items[i].Price < 0 {
 				items[i].Price = 0
 			}
-			items[i].LostValue = items[i].ProcurementPrice - items[i].Price
+			items[i].LostValue = items[i].ProcurementPrice - items[i].Price*/
 		}
 	}
 
