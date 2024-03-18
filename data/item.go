@@ -709,7 +709,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//makni obavezno office_id - zakucavanje da rade ove popisne liste njihove
 	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
-		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase, i.office_id, i.assessment_value
+		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase, i.office_id, i.assessment_price
 		FROM items i
 		JOIN assessments a ON i.id = a.inventory_id
 		WHERE (i.id, a.id) IN (
