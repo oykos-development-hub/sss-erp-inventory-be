@@ -446,7 +446,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		conditions = conditions + " and NOW() > a.date_of_assessment + interval '1 year' * a.estimated_duration "
 	}
 
-	return selectPart + conditions + " group by i.id"
+	return selectPart + conditions
 }
 
 // Get gets one record from the database, by id, using upper
