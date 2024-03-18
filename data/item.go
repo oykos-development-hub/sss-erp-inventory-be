@@ -735,6 +735,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			if err != nil {
 				return nil, err
 			}
+			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
 			/*depreciationRate := 100 / estimatedDuration
 			monthlyDepreciationRate := float32(depreciationRate) / 12
 
