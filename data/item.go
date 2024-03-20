@@ -197,7 +197,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number like '" + *filter.InventoryNumber + "%'"
+		conditions = conditions + " and i.inventory_number like '%" + *filter.InventoryNumber + "%'"
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -397,7 +397,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.Search != nil {
-		conditions = conditions + " and (i.inventory_number like '" + *filter.Search + "%' or i.title like '" + *filter.Search + "%' )"
+		conditions = conditions + " and (i.inventory_number like '%" + *filter.Search + "%' or i.title like '" + *filter.Search + "%' )"
 	}
 
 	if filter.Type != nil {
