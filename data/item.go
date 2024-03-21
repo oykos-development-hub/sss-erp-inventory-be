@@ -637,40 +637,41 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		}
 	}
 
-	//PS2 items in moment 'date'
-	query2 := `WITH RankedDispatches AS (
-		SELECT i.id, d.source_organization_unit_id, d.type, d.date,
-		ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
-		FROM items i
-		JOIN dispatch_items di ON i.id = di.inventory_id
-		JOIN dispatches d ON di.dispatch_id = d.id
-		WHERE ((d.type = 'revers' AND d.target_organization_unit_id = $1)
-		OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
-		  AND d.date < $2
-	  )
-	  SELECT id, source_organization_unit_id
-	  FROM RankedDispatches
-	  WHERE rn <= 1 and type = 'revers';`
+	/*
+		//PS2 items in moment 'date'
+		query2 := `WITH RankedDispatches AS (
+			SELECT i.id, d.source_organization_unit_id, d.type, d.date,
+			ROW_NUMBER() OVER (PARTITION BY i.id ORDER BY d.date DESC) AS rn
+			FROM items i
+			JOIN dispatch_items di ON i.id = di.inventory_id
+			JOIN dispatches d ON di.dispatch_id = d.id
+			WHERE ((d.type = 'revers' AND d.target_organization_unit_id = $1)
+			OR (d.type = 'return-revers' AND d.source_organization_unit_id = $1))
+			  AND d.date < $2
+		  )
+		  SELECT id, source_organization_unit_id
+		  FROM RankedDispatches
+		  WHERE rn <= 1 and type = 'revers';`
 
-	rows2, err := upper.SQL().Query(query2, *organizationUnitID, *date)
-	if err != nil {
-		return nil, err
-	}
-	defer rows2.Close()
-
-	for rows2.Next() {
-		var item ItemReportResponse
-		err = rows2.Scan(&item.ID, &item.SourceOrganizationUnitID)
+		rows2, err := upper.SQL().Query(query2, *organizationUnitID, *date)
 		if err != nil {
 			return nil, err
 		}
-		item.SourceType = "PS2"
-		if (sourceType == nil || (sourceType != nil && *sourceType == item.SourceType)) &&
-			(itemType == nil || (itemType != nil && *itemType == item.SourceType)) {
-			items = append(items, item)
-		}
-	}
+		defer rows2.Close()
 
+		for rows2.Next() {
+			var item ItemReportResponse
+			err = rows2.Scan(&item.ID, &item.SourceOrganizationUnitID)
+			if err != nil {
+				return nil, err
+			}
+			item.SourceType = "PS2"
+			if (sourceType == nil || (sourceType != nil && *sourceType == item.SourceType)) &&
+				(itemType == nil || (itemType != nil && *itemType == item.SourceType)) {
+				items = append(items, item)
+			}
+		}
+	*/
 	//checks office of item in moment date
 	query4 := `WITH RankedDispatches AS (
 			SELECT i.id, d.type, d.office_id, d.date
