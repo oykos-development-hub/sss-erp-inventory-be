@@ -581,7 +581,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	//NS1 && PS1 items in moment 'date'
 	query1 := `SELECT i.id, i.type, i.is_external_donation
 	  FROM items i
-	  WHERE i.organization_unit_id = $1 and i.date_of_purchase < $2`
+	  WHERE i.organization_unit_id = $1 and i.date_of_purchase < $2 and i.is_external_donation = false`
 
 	rows1, err := upper.SQL().Query(query1, *organizationUnitID, *date)
 	if err != nil {
