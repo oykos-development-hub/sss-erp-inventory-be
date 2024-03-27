@@ -581,7 +581,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	//NS1 && PS1 items in moment 'date'
 	query1 := `SELECT i.id, i.type, i.is_external_donation
 	  FROM items i
-	  WHERE i.organization_unit_id = $1 and i.date_of_purchase < $2 and i.is_external_donation = false`
+	  WHERE i.organization_unit_id = $1 and i.date_of_purchase <= $2 and i.is_external_donation = false`
 
 	rows1, err := upper.SQL().Query(query1, *organizationUnitID, *date)
 	if err != nil {
@@ -600,7 +600,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		//checks was item donation
 		query3 := ` SELECT i.id
 		FROM items i, dispatches d, dispatch_items di
-		WHERE i.id = $1 and date > $2 and d.id = di.dispatch_id 
+		WHERE i.id = $1 and date >= $2 and d.id = di.dispatch_id 
 		and d.type = 'convert' and di.inventory_id = i.id;`
 
 		rows3, err := upper.SQL().Query(query3, item.ID, *date)
@@ -679,7 +679,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			JOIN dispatch_items di ON i.id = di.inventory_id
 			JOIN dispatches d ON di.dispatch_id = d.id
 			WHERE (d.type = 'allocation' OR d.type = 'return' OR d.type='created')
-			AND date < $1 AND i.id = $2
+			AND date <= $1 AND i.id = $2
 			ORDER BY date DESC)
 			  SELECT office_id
 			  FROM RankedDispatches
@@ -717,7 +717,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		  SELECT i.id,  MAX(a.id) AS max_date
 		  FROM items i
 		  JOIN assessments a ON i.id = a.inventory_id
-		  WHERE a.date_of_assessment < $1 and i.id = $2
+		  WHERE a.date_of_assessment <= $1 and i.id = $2
 		  GROUP BY i.id)
 		  LIMIT 1;`
 
