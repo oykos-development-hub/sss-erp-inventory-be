@@ -88,6 +88,7 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 		Search:                    filter.Search,
 		ContractID:                filter.ContractID,
 		DeprecationTypeID:         filter.DeprecationTypeID,
+		InvoiceArticleID:          filter.InvoiceArticleID,
 		ArticleID:                 filter.ArticleID,
 		SourceOrganizationUnitID:  filter.SourceOrganizationUnitID,
 		OrganizationUnitID:        filter.OrganizationUnitID,

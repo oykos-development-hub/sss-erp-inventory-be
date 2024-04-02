@@ -12,6 +12,7 @@ import (
 type Item struct {
 	ID                           int           `db:"id,omitempty"`
 	ArticleID                    *int          `db:"article_id"`
+	InvoiceArticleID             *int          `db:"invoice_article_id"`
 	Type                         string        `db:"type"`
 	ClassTypeID                  int           `db:"class_type_id"`
 	DepreciationTypeID           int           `db:"depreciation_type_id"`
@@ -66,6 +67,7 @@ type InventoryItemFilter struct {
 	ContractID                *int    `json:"contract_id"`
 	DeprecationTypeID         *int    `json:"depreciation_type_id"`
 	ArticleID                 *int    `json:"article_id"`
+	InvoiceArticleID          *int    `json:"invoice_article_id"`
 	SourceOrganizationUnitID  *int    `json:"source_organization_unit_id"`
 	OrganizationUnitID        *int    `json:"organization_unit_id"`
 	SerialNumber              *string `json:"serial_number"`
@@ -179,6 +181,11 @@ func buildQuery(filter InventoryItemFilter) string {
 	if filter.ArticleID != nil {
 		articleIDString := strconv.Itoa(*filter.ArticleID)
 		conditions = conditions + " and i.article_id = " + articleIDString
+	}
+
+	if filter.InvoiceArticleID != nil {
+		articleIDString := strconv.Itoa(*filter.InvoiceArticleID)
+		conditions = conditions + " and i.invoice_article_id = " + articleIDString
 	}
 
 	if filter.ClassTypeID != nil {
@@ -346,6 +353,11 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	if filter.ArticleID != nil {
 		articleIDString := strconv.Itoa(*filter.ArticleID)
 		conditions = conditions + " and i.article_id = " + articleIDString
+	}
+
+	if filter.InvoiceArticleID != nil {
+		articleIDString := strconv.Itoa(*filter.InvoiceArticleID)
+		conditions = conditions + " and i.invoice_article_id = " + articleIDString
 	}
 
 	if filter.ClassTypeID != nil {

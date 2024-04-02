@@ -9,6 +9,7 @@ import (
 
 type ItemDTO struct {
 	ArticleID                    *int          `json:"article_id"`
+	InvoiceArticleID             *int          `json:"invoice_article_id"`
 	Type                         string        `json:"type"`
 	ClassTypeID                  int           `json:"class_type_id"`
 	DepreciationTypeID           int           `json:"depreciation_type_id"`
@@ -55,6 +56,7 @@ type ItemDTO struct {
 type ItemResponseDTO struct {
 	ID                           int        `json:"id"`
 	ArticleID                    *int       `json:"article_id"`
+	InvoiceArticleID             *int       `json:"invoice_article_id"`
 	Type                         string     `json:"type"`
 	ClassTypeID                  int        `json:"class_type_id"`
 	DepreciationTypeID           int        `json:"depreciation_type_id"`
@@ -103,6 +105,7 @@ type ItemResponseDTO struct {
 func (dto ItemDTO) ToItem() *data.Item {
 	return &data.Item{
 		ArticleID:                    dto.ArticleID,
+		InvoiceArticleID:             dto.InvoiceArticleID,
 		Type:                         dto.Type,
 		ClassTypeID:                  dto.ClassTypeID,
 		DepreciationTypeID:           dto.DepreciationTypeID,
@@ -157,6 +160,7 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 
 	return ItemResponseDTO{
 		ID:                           data.ID,
+		InvoiceArticleID:             data.InvoiceArticleID,
 		ArticleID:                    data.ArticleID,
 		Type:                         data.Type,
 		ClassTypeID:                  data.ClassTypeID,
@@ -213,6 +217,7 @@ type InventoryItemFilter struct {
 	ContractID                *int    `json:"contract_id"`
 	DeprecationTypeID         *int    `json:"depreciation_type_id"`
 	ArticleID                 *int    `json:"article_id"`
+	InvoiceArticleID          *int    `json:"invoice_article_id"`
 	SourceOrganizationUnitID  *int    `json:"source_organization_unit_id"`
 	OrganizationUnitID        *int    `json:"organization_unit_id"`
 	SerialNumber              *string `json:"serial_number"`
