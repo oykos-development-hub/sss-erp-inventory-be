@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS items (
     deactivation_file_id INTEGER,
     file_id INTEGER,
     donation_description TEXT,
-    donation_files []INTEGER,
+    donation_files INTEGER[],
     is_external_donation BOOLEAN,
     owner TEXT,
 )
