@@ -16,9 +16,9 @@ func (t *DispatchItem) Table() string {
 	return "dispatch_items"
 }
 
-// GetAll gets all records from the database, using upper
+// GetAll gets all records from the database, using Upper
 func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*DispatchItem
 
 	res := collection.Find(up.Cond{"inventory_id": id})
@@ -32,7 +32,7 @@ func (t *DispatchItem) GetAll(id int) ([]*DispatchItem, error) {
 }
 
 func (t *DispatchItem) GetItemListOfDispatch(dispatchID int) ([]*DispatchItem, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*DispatchItem
 
 	res := collection.Find(up.Cond{"dispatch_id": dispatchID})
@@ -52,7 +52,7 @@ func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem
 			FROM items i, dispatch_items d 
 			WHERE i.id = d.inventory_id and i.type = $1`
 
-		rows, err := upper.SQL().Query(query, status)
+		rows, err := Upper.SQL().Query(query, status)
 		if err != nil {
 			return nil, err
 		}
@@ -68,7 +68,7 @@ func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem
 		}
 	} else if dispatch != nil {
 		var res up.Result
-		collection := upper.Collection(t.Table())
+		collection := Upper.Collection(t.Table())
 		res = collection.Find(up.Cond{"dispatch_id": &dispatch})
 
 		err := res.OrderBy("id desc").All(&all)
@@ -82,10 +82,10 @@ func (t *DispatchItem) GetAllInv(status *string, dispatch *int) ([]*DispatchItem
 	return all, nil
 }
 
-// Get gets one record from the database, by id, using upper
+// Get gets one record from the database, by id, using Upper
 func (t *DispatchItem) Get(id int) (*DispatchItem, error) {
 	var one DispatchItem
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -95,9 +95,9 @@ func (t *DispatchItem) Get(id int) (*DispatchItem, error) {
 	return &one, nil
 }
 
-// Update updates a record in the database, using upper
+// Update updates a record in the database, using Upper
 func (t *DispatchItem) Update(m DispatchItem) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -106,9 +106,9 @@ func (t *DispatchItem) Update(m DispatchItem) error {
 	return nil
 }
 
-// Delete deletes a record from the database by id, using upper
+// Delete deletes a record from the database by id, using Upper
 func (t *DispatchItem) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -117,9 +117,9 @@ func (t *DispatchItem) Delete(id int) error {
 	return nil
 }
 
-// Insert inserts a model into the database, using upper
+// Insert inserts a model into the database, using Upper
 func (t *DispatchItem) Insert(m DispatchItem) (int, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err

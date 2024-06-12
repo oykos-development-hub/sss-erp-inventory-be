@@ -10,7 +10,8 @@ type Handlers struct {
 	AssessmentHandler   AssessmentHandler
 	DispatchHandler     DispatchHandler
 	DispatchItemHandler DispatchItemHandler
-}
+	LogHandler LogHandler
+	}
 
 type RealEstateHandler interface {
 	CreateRealEstate(w http.ResponseWriter, r *http.Request)
@@ -55,4 +56,12 @@ type DispatchItemHandler interface {
 	GetDispatchItemListByItemId(w http.ResponseWriter, r *http.Request)
 	GetDispatchItemListByStatus(w http.ResponseWriter, r *http.Request)
 	GetItemsByDispatch(w http.ResponseWriter, r *http.Request)
+}
+
+type LogHandler interface {
+	CreateLog(w http.ResponseWriter, r *http.Request)
+	UpdateLog(w http.ResponseWriter, r *http.Request)
+	DeleteLog(w http.ResponseWriter, r *http.Request)
+	GetLogById(w http.ResponseWriter, r *http.Request)
+	GetLogList(w http.ResponseWriter, r *http.Request)
 }

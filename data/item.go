@@ -1,11 +1,15 @@
 package data
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/lib/pq"
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/inventory-api/contextutil"
 )
 
 // Item struct
@@ -95,7 +99,7 @@ func (t *Item) Table() string {
 	return "items"
 }
 
-// GetAll gets all records from the database, using upper
+// GetAll gets all records from the database, using Upper
 func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 	var items []*Item
 	var query string
@@ -105,7 +109,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 	} else {
 		query = buildQuery(filter)
 	}
-	rows, err := upper.SQL().Query(query)
+	rows, err := Upper.SQL().Query(query)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -133,7 +137,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		query = buildQueryForTotal(filter)
 	}
 
-	rows, err = upper.SQL().Query(query)
+	rows, err = Upper.SQL().Query(query)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -461,10 +465,10 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	return selectPart + conditions
 }
 
-// Get gets one record from the database, by id, using upper
+// Get gets one record from the database, by id, using Upper
 func (t *Item) Get(id int) (*Item, error) {
 	var one Item
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -474,40 +478,99 @@ func (t *Item) Get(id int) (*Item, error) {
 	return &one, nil
 }
 
-// Update updates a record in the database, using upper
-func (t *Item) Update(m Item) error {
+// Update updates a record in the database, using Upper
+func (t *Item) Update(ctx context.Context, m Item) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Delete deletes a record from the database by id, using upper
-func (t *Item) Delete(id int) error {
-	collection := upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+// Delete deletes a record from the database by id, using Upper
+func (t *Item) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Insert inserts a model into the database, using upper
-func (t *Item) Insert(m Item) (int, error) {
+// Insert inserts a model into the database, using Upper
+func (t *Item) Insert(ctx context.Context, m Item) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }
@@ -518,7 +581,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 	query1 := `select i.id, d.id from items i, dispatches d, dispatch_items di 
 			   where i.id = di.inventory_id and d.id = di.dispatch_id and d.target_organization_unit_id = $1;`
 
-	rows, err := upper.SQL().Query(query1, id)
+	rows, err := Upper.SQL().Query(query1, id)
 	if err != nil {
 		return nil, err
 	}
@@ -534,7 +597,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 		query2 := `select d.id from dispatches d, dispatch_items i 
 				 where d.id > $1 and d.type = 'return-revers' and i.inventory_id = $2 
 				 and d.id = i.dispatch_id order by d.id;`
-		rowDispatch, err := upper.SQL().Query(query2, item.ReversID, item.ItemID)
+		rowDispatch, err := Upper.SQL().Query(query2, item.ReversID, item.ItemID)
 		if err != nil {
 			return nil, err
 		}
@@ -550,7 +613,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 					 where i.id = di.inventory_id and d.id = di.dispatch_id and i.id = $1 
 					 and d.id >= $2 and d.id <= $3;
 			`
-			rowMedium, err := upper.SQL().Query(query3, item.ItemID, item.ReversID, item.ReturnID)
+			rowMedium, err := Upper.SQL().Query(query3, item.ItemID, item.ReversID, item.ReturnID)
 			if err != nil {
 				return nil, err
 			}
@@ -595,7 +658,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	  FROM items i
 	  WHERE i.organization_unit_id = $1 and i.date_of_purchase <= $2 and i.is_external_donation = false`
 
-	rows1, err := upper.SQL().Query(query1, *organizationUnitID, *date)
+	rows1, err := Upper.SQL().Query(query1, *organizationUnitID, *date)
 	if err != nil {
 		return nil, err
 	}
@@ -615,7 +678,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		WHERE i.id = $1 and date >= $2 and d.id = di.dispatch_id 
 		and d.type = 'convert' and di.inventory_id = i.id;`
 
-		rows3, err := upper.SQL().Query(query3, item.ID, *date)
+		rows3, err := Upper.SQL().Query(query3, item.ID, *date)
 		if err != nil {
 			return nil, err
 		}
@@ -643,8 +706,8 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				item.SourceType = "NS1"
 			}
 		}
-		if (sourceType == nil || (sourceType != nil && *sourceType == item.SourceType)) &&
-			(itemType == nil || (itemType != nil && *itemType == sourceTypeQuery)) {
+		if (sourceType == nil || (*sourceType == item.SourceType)) &&
+			(itemType == nil || (*itemType == sourceTypeQuery)) {
 			items = append(items, item)
 		}
 	}
@@ -665,7 +728,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		  FROM RankedDispatches
 		  WHERE rn <= 1 and type = 'revers';`
 
-		rows2, err := upper.SQL().Query(query2, *organizationUnitID, *date)
+		rows2, err := Upper.SQL().Query(query2, *organizationUnitID, *date)
 		if err != nil {
 			return nil, err
 		}
@@ -699,7 +762,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	var currentResponse []ItemReportResponse
 
 	for _, item := range items {
-		rows4, err := upper.SQL().Query(query4, *date, item.ID)
+		rows4, err := Upper.SQL().Query(query4, *date, item.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -712,7 +775,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				return nil, err
 			}
 		}
-		if officeID == nil || (officeID != nil && *officeID == officeIDQuery) {
+		if officeID == nil || (*officeID == officeIDQuery) {
 			item.OfficeID = officeIDQuery
 			currentResponse = append(currentResponse, item)
 		}
@@ -734,7 +797,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		  LIMIT 1;`
 
 	for i := 0; i < len(items); i++ {
-		rows5, err := upper.SQL().Query(query5, *date, items[i].ID)
+		rows5, err := Upper.SQL().Query(query5, *date, items[i].ID)
 		if err != nil {
 			return nil, err
 		}

@@ -48,6 +48,12 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Delete("/dispatch-items/{id}", handlers.DispatchItemHandler.DeleteDispatchItem)
 		rt.Get("/item/{id}/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByItemId)
 		rt.Get("/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByStatus)
+	
+		rt.Post("/logs", handlers.LogHandler.CreateLog)
+rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
+rt.Get("/logs", handlers.LogHandler.GetLogList)
+rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
+rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
 	})
 
 	return app.Routes

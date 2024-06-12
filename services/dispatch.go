@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
 	"gitlab.sudovi.me/erp/inventory-api/errors"
@@ -21,10 +23,10 @@ func NewDispatchServiceImpl(app *celeritas.Celeritas, repo data.Dispatch) Dispat
 	}
 }
 
-func (h *DispatchServiceImpl) CreateDispatch(input dto.DispatchDTO) (*dto.DispatchResponseDTO, error) {
+func (h *DispatchServiceImpl) CreateDispatch(ctx context.Context, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error) {
 	data := input.ToDispatch()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -39,11 +41,11 @@ func (h *DispatchServiceImpl) CreateDispatch(input dto.DispatchDTO) (*dto.Dispat
 	return &res, nil
 }
 
-func (h *DispatchServiceImpl) UpdateDispatch(id int, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error) {
+func (h *DispatchServiceImpl) UpdateDispatch(ctx context.Context, id int, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error) {
 	data := input.ToDispatch()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -58,8 +60,8 @@ func (h *DispatchServiceImpl) UpdateDispatch(id int, input dto.DispatchDTO) (*dt
 	return &response, nil
 }
 
-func (h *DispatchServiceImpl) DeleteDispatch(id int) error {
-	err := h.repo.Delete(id)
+func (h *DispatchServiceImpl) DeleteDispatch(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

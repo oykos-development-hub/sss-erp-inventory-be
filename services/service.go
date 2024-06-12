@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
 )
@@ -21,9 +23,9 @@ type RealEstateService interface {
 }
 
 type ItemService interface {
-	CreateItem(input dto.ItemDTO) (*dto.ItemResponseDTO, error)
-	UpdateItem(id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error)
-	DeleteItem(id int) error
+	CreateItem(ctx context.Context, input dto.ItemDTO) (*dto.ItemResponseDTO, error)
+	UpdateItem(ctx context.Context, id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error)
+	DeleteItem(ctx context.Context, id int) error
 	GetItem(id int) (*dto.ItemResponseDTO, error)
 	GetItemList(filter dto.InventoryItemFilter) ([]dto.ItemResponseDTO, *uint64, error)
 	GetItemListInOrganizationUnit(id int) ([]data.ItemInOrganizationUnit, error)
@@ -31,18 +33,18 @@ type ItemService interface {
 }
 
 type AssessmentService interface {
-	CreateAssessment(input dto.AssessmentDTO) (*dto.AssessmentResponseDTO, error)
-	UpdateAssessment(id int, input dto.AssessmentDTO) (*dto.AssessmentResponseDTO, error)
-	DeleteAssessment(id int) error
+	CreateAssessment(ctx context.Context, input dto.AssessmentDTO) (*dto.AssessmentResponseDTO, error)
+	UpdateAssessment(ctx context.Context, id int, input dto.AssessmentDTO) (*dto.AssessmentResponseDTO, error)
+	DeleteAssessment(ctx context.Context, id int) error
 	GetAssessment(id int) (*dto.AssessmentResponseDTO, error)
 	GetAssessmentList() ([]dto.AssessmentResponseDTO, error)
 	GetAssessmentbyItemId(id int) ([]dto.AssessmentResponseDTO, *uint64, error)
 }
 
 type DispatchService interface {
-	CreateDispatch(input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
-	UpdateDispatch(id int, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
-	DeleteDispatch(id int) error
+	CreateDispatch(ctx context.Context, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
+	UpdateDispatch(ctx context.Context, id int, input dto.DispatchDTO) (*dto.DispatchResponseDTO, error)
+	DeleteDispatch(ctx context.Context, id int) error
 	GetDispatch(id int) (*dto.DispatchResponseDTO, error)
 	GetDispatchList(input *dto.GetDispatchListInput) ([]dto.DispatchResponseDTO, *uint64, error)
 }
@@ -54,4 +56,12 @@ type DispatchItemService interface {
 	GetDispatchItemList(id int) ([]dto.DispatchItemResponseDTO, error)
 	GetDispatchItemListbyStatus(Type *string, DispatchID *int) ([]dto.DispatchItemResponseDTO, error)
 	GetItemListOfDispatch(dispatchID int) ([]dto.ItemResponseDTO, error)
+}
+
+type LogService interface {
+	CreateLog(input dto.LogDTO) (*dto.LogResponseDTO, error)
+	UpdateLog(id int, input dto.LogDTO) (*dto.LogResponseDTO, error)
+	DeleteLog(id int) error
+	GetLog(id int) (*dto.LogResponseDTO, error)
+	GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseDTO, *uint64, error)
 }

@@ -44,12 +44,17 @@ func initApplication() *celeritas.Celeritas {
 	AssessmentService := services.NewAssessmentServiceImpl(cel, models.Assessment)
 	AssessmentHandler := handlers.NewAssessmentHandler(cel, AssessmentService)
 
+		
+	LogService := services.NewLogServiceImpl(cel, models.Log)
+	LogHandler := handlers.NewLogHandler(cel, LogService)
+
 	myHandlers := &handlers.Handlers{
 		RealEstateHandler:   RealEstateHandler,
 		ItemHandler:         ItemHandler,
 		AssessmentHandler:   AssessmentHandler,
 		DispatchHandler:     DispatchHandler,
 		DispatchItemHandler: DispatchItemHandler,
+		LogHandler: LogHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{

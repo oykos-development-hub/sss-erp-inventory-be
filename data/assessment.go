@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/inventory-api/contextutil"
 )
 
 // Assessment struct
@@ -16,7 +20,7 @@ type Assessment struct {
 	EstimatedDuration    int        `db:"estimated_duration"`
 	GrossPriceNew        float32    `db:"gross_price_new"`
 	GrossPriceDifference float32    `db:"gross_price_difference"`
-	ResidualPrice *float32 `db:"residual_price"`
+	ResidualPrice        *float32   `db:"residual_price"`
 	DateOfAssessment     *time.Time `db:"date_of_assessment"`
 	CreatedAt            time.Time  `db:"created_at,omitempty"`
 	UpdatedAt            time.Time  `db:"updated_at"`
@@ -29,9 +33,9 @@ func (t *Assessment) Table() string {
 	return "assessments"
 }
 
-// GetAll gets all records from the database, using upper
+// GetAll gets all records from the database, using Upper
 func (t *Assessment) GetAll(page *int, size *int, condition *up.Cond) ([]*Assessment, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*Assessment
 	var res up.Result
 
@@ -58,10 +62,10 @@ func (t *Assessment) GetAll(page *int, size *int, condition *up.Cond) ([]*Assess
 	return all, &total, nil
 }
 
-// Get gets one record from the database, by id, using upper
+// Get gets one record from the database, by id, using Upper
 func (t *Assessment) Get(id int) (*Assessment, error) {
 	var one Assessment
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -71,40 +75,99 @@ func (t *Assessment) Get(id int) (*Assessment, error) {
 	return &one, nil
 }
 
-// Update updates a record in the database, using upper
-func (t *Assessment) Update(m Assessment) error {
+// Update updates a record in the database, using Upper
+func (t *Assessment) Update(ctx context.Context, m Assessment) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Delete deletes a record from the database by id, using upper
-func (t *Assessment) Delete(id int) error {
-	collection := upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+// Delete deletes a record from the database by id, using Upper
+func (t *Assessment) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Insert inserts a model into the database, using upper
-func (t *Assessment) Insert(m Assessment) (int, error) {
+// Insert inserts a model into the database, using Upper
+func (t *Assessment) Insert(ctx context.Context, m Assessment) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
-
-	id := getInsertId(res.ID())
 
 	return id, nil
 }

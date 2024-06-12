@@ -1,6 +1,8 @@
 package services
 
 import (
+	"context"
+
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
 	"gitlab.sudovi.me/erp/inventory-api/errors"
@@ -20,10 +22,10 @@ func NewItemServiceImpl(app *celeritas.Celeritas, repo data.Item) ItemService {
 	}
 }
 
-func (h *ItemServiceImpl) CreateItem(input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
+func (h *ItemServiceImpl) CreateItem(ctx context.Context, input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
 	data := input.ToItem()
 
-	id, err := h.repo.Insert(*data)
+	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -38,11 +40,11 @@ func (h *ItemServiceImpl) CreateItem(input dto.ItemDTO) (*dto.ItemResponseDTO, e
 	return &res, nil
 }
 
-func (h *ItemServiceImpl) UpdateItem(id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
+func (h *ItemServiceImpl) UpdateItem(ctx context.Context, id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
 	data := input.ToItem()
 	data.ID = id
 
-	err := h.repo.Update(*data)
+	err := h.repo.Update(ctx, *data)
 	if err != nil {
 		return nil, errors.ErrInternalServer
 	}
@@ -57,8 +59,8 @@ func (h *ItemServiceImpl) UpdateItem(id int, input dto.ItemDTO) (*dto.ItemRespon
 	return &response, nil
 }
 
-func (h *ItemServiceImpl) DeleteItem(id int) error {
-	err := h.repo.Delete(id)
+func (h *ItemServiceImpl) DeleteItem(ctx context.Context, id int) error {
+	err := h.repo.Delete(ctx, id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
 		return errors.ErrInternalServer

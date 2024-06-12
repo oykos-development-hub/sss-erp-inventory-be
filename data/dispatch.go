@@ -1,9 +1,13 @@
 package data
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	up "github.com/upper/db/v4"
+	"gitlab.sudovi.me/erp/inventory-api/contextutil"
 )
 
 // Dispatch struct
@@ -31,9 +35,9 @@ func (t *Dispatch) Table() string {
 	return "dispatches"
 }
 
-// GetAll gets all records from the database, using upper
+// GetAll gets all records from the database, using Upper
 func (t *Dispatch) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Dispatch, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*Dispatch
 	var res up.Result
 
@@ -59,10 +63,10 @@ func (t *Dispatch) GetAll(page *int, size *int, condition *up.AndExpr) ([]*Dispa
 	return all, &total, err
 }
 
-// Get gets one record from the database, by id, using upper
+// Get gets one record from the database, by id, using Upper
 func (t *Dispatch) Get(id int) (*Dispatch, error) {
 	var one Dispatch
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -72,125 +76,99 @@ func (t *Dispatch) Get(id int) (*Dispatch, error) {
 	return &one, nil
 }
 
-// Update updates a record in the database, using upper
-func (t *Dispatch) Update(m Dispatch) error {
+// Update updates a record in the database, using Upper
+func (t *Dispatch) Update(ctx context.Context, m Dispatch) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res := collection.Find(m.ID)
-	err := res.Update(&m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(m.ID)
+		if err := res.Update(&m); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Delete deletes a record from the database by id, using upper
-func (t *Dispatch) Delete(id int) error {
-	collection := upper.Collection(t.Table())
-	res := collection.Find(id)
-	err := res.Delete()
+// Delete deletes a record from the database by id, using Upper
+func (t *Dispatch) Delete(ctx context.Context, id int) error {
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return errors.New("user ID not found in context")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+		res := collection.Find(id)
+		if err := res.Delete(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// Insert inserts a model into the database, using upper
-func (t *Dispatch) Insert(m Dispatch) (int, error) {
+// Insert inserts a model into the database, using Upper
+func (t *Dispatch) Insert(ctx context.Context, m Dispatch) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
-	res, err := collection.Insert(m)
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		return 0, errors.New("user ID not found in context")
+	}
+
+	var id int
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return err
+		}
+
+		collection := sess.Collection(t.Table())
+
+		var res up.InsertResult
+		var err error
+
+		if res, err = collection.Insert(m); err != nil {
+			return err
+		}
+
+		id = getInsertId(res.ID())
+
+		return nil
+	})
+
 	if err != nil {
 		return 0, err
 	}
 
-	id := getInsertId(res.ID())
-	m.ID = id
-
-	if m.Type == "allocation" {
-		err = incrementDispatchIDForInternal(collection, m)
-		if err != nil {
-			return 0, err
-		}
-	} else if m.Type == "revers" {
-		err = incrementDispatchIDForExternal(collection, m)
-		if err != nil {
-			return 0, err
-		}
-	}
-
 	return id, nil
-}
-
-func incrementDispatchIDForInternal(collection up.Collection, m Dispatch) error {
-
-	query := `SELECT dispatch_id
-		    	FROM dispatches
-				WHERE type = 'allocation' AND source_organization_unit_id = $1
-				ORDER BY dispatch_id DESC
-				LIMIT 1`
-
-	rows, err := upper.SQL().Query(query, m.SourceOrganizationUnitID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	dispatchID := 0
-
-	for rows.Next() {
-		err = rows.Scan(&dispatchID)
-		if err != nil {
-			return err
-		}
-	}
-
-	query = `UPDATE dispatches
-				SET dispatch_id = $2
-				WHERE id = $1`
-
-	dispatchID++
-	_, err = upper.SQL().Query(query, m.ID, dispatchID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func incrementDispatchIDForExternal(collection up.Collection, m Dispatch) error {
-
-	query := `SELECT dispatch_id
-		    	FROM dispatches
-				WHERE type = 'revers' AND source_organization_unit_id = $1
-				ORDER BY dispatch_id DESC
-				LIMIT 1`
-
-	rows, err := upper.SQL().Query(query, m.SourceOrganizationUnitID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	dispatchID := 0
-
-	for rows.Next() {
-		err = rows.Scan(&dispatchID)
-		if err != nil {
-			return err
-		}
-	}
-
-	query = `UPDATE dispatches
-				SET dispatch_id = $2
-				WHERE id = $1`
-
-	dispatchID++
-	_, err = upper.SQL().Query(query, m.ID, dispatchID)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

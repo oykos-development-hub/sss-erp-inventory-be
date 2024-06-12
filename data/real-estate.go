@@ -32,9 +32,9 @@ func (t *RealEstate) Table() string {
 	return "real_estates"
 }
 
-// GetAll gets all records from the database, using upper
+// GetAll gets all records from the database, using Upper
 func (t *RealEstate) GetAll(page *int, size *int, condition *up.Cond) ([]*RealEstate, *uint64, error) {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	var all []*RealEstate
 	var res up.Result
 
@@ -61,10 +61,10 @@ func (t *RealEstate) GetAll(page *int, size *int, condition *up.Cond) ([]*RealEs
 	return all, &total, nil
 }
 
-// Get gets one record from the database, by id, using upper
+// Get gets one record from the database, by id, using Upper
 func (t *RealEstate) Get(id int) (*RealEstate, error) {
 	var one RealEstate
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
@@ -74,10 +74,10 @@ func (t *RealEstate) Get(id int) (*RealEstate, error) {
 	return &one, nil
 }
 
-// Update updates a record in the database, using upper
+// Update updates a record in the database, using Upper
 func (t *RealEstate) Update(m RealEstate) error {
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
@@ -86,9 +86,9 @@ func (t *RealEstate) Update(m RealEstate) error {
 	return nil
 }
 
-// Delete deletes a record from the database by id, using upper
+// Delete deletes a record from the database by id, using Upper
 func (t *RealEstate) Delete(id int) error {
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
@@ -97,11 +97,11 @@ func (t *RealEstate) Delete(id int) error {
 	return nil
 }
 
-// Insert inserts a model into the database, using upper
+// Insert inserts a model into the database, using Upper
 func (t *RealEstate) Insert(m RealEstate) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
-	collection := upper.Collection(t.Table())
+	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
 		return 0, err
