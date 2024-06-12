@@ -40,7 +40,7 @@ type Item struct {
 	GrossPrice                   float32       `db:"gross_price"`
 	AssessmentPrice              *float32      `db:"assessment_price"`
 	Description                  *string       `db:"description"`
-	DateOfPurchase               time.Time     `db:"date_of_purchase"`
+	DateOfPurchase               *time.Time    `db:"date_of_purchase"`
 	Inactive                     *time.Time    `db:"inactive"`
 	Source                       *string       `db:"source"`
 	SourceType                   *string       `db:"source_type"`

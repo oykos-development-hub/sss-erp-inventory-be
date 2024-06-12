@@ -32,7 +32,7 @@ type ItemDTO struct {
 	NetPrice                     *float32      `json:"net_price"`
 	GrossPrice                   float32       `json:"gross_price"`
 	Description                  *string       `json:"description"`
-	DateOfPurchase               time.Time     `json:"date_of_purchase"`
+	DateOfPurchase               *time.Time    `json:"date_of_purchase"`
 	Inactive                     *time.Time    `json:"inactive"`
 	Source                       *string       `json:"source"`
 	SourceType                   *string       `json:"source_type"`
@@ -80,7 +80,7 @@ type ItemResponseDTO struct {
 	NetPrice                     *float32   `json:"net_price"`
 	GrossPrice                   float32    `json:"gross_price"`
 	Description                  *string    `json:"description"`
-	DateOfPurchase               time.Time  `json:"date_of_purchase"`
+	DateOfPurchase               *time.Time `json:"date_of_purchase"`
 	Inactive                     *time.Time `json:"inactive"`
 	Source                       *string    `json:"source"`
 	SourceType                   *string    `json:"source_type"`
