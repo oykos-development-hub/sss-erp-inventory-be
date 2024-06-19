@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
-	"gitlab.sudovi.me/erp/inventory-api/errors"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -28,12 +28,12 @@ func (h *DispatchServiceImpl) CreateDispatch(ctx context.Context, input dto.Disp
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch get")
 	}
 
 	res := dto.ToDispatchResponseDTO(*data)
@@ -47,12 +47,12 @@ func (h *DispatchServiceImpl) UpdateDispatch(ctx context.Context, id int, input 
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch get")
 	}
 
 	response := dto.ToDispatchResponseDTO(*data)
@@ -63,8 +63,7 @@ func (h *DispatchServiceImpl) UpdateDispatch(ctx context.Context, id int, input 
 func (h *DispatchServiceImpl) DeleteDispatch(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo dispatch delete")
 	}
 
 	return nil
@@ -74,7 +73,7 @@ func (h *DispatchServiceImpl) GetDispatch(id int) (*dto.DispatchResponseDTO, err
 	data, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo dispatch get all")
 	}
 	response := dto.ToDispatchResponseDTO(*data)
 
@@ -111,8 +110,7 @@ func (h *DispatchServiceImpl) GetDispatchList(input *dto.GetDispatchListInput) (
 
 	data, total, err := h.repo.GetAll(input.Page, input.Size, conditionAndExp)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo dispatch get all")
 	}
 
 	response := dto.ToDispatchListResponseDTO(data)

@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
-	"gitlab.sudovi.me/erp/inventory-api/errors"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -26,12 +26,12 @@ func (h *RealEstateServiceImpl) CreateRealEstate(input dto.RealEstateDTO) (*dto.
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo real estate insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo real estate get")
 	}
 
 	res := dto.ToRealEstateResponseDTO(*data)
@@ -45,12 +45,12 @@ func (h *RealEstateServiceImpl) UpdateRealEstate(id int, input dto.RealEstateDTO
 
 	err := h.repo.Update(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo real estate update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo real estate get")
 	}
 
 	response := dto.ToRealEstateResponseDTO(*data)
@@ -61,8 +61,7 @@ func (h *RealEstateServiceImpl) UpdateRealEstate(id int, input dto.RealEstateDTO
 func (h *RealEstateServiceImpl) DeleteRealEstate(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo real estate delete")
 	}
 
 	return nil
@@ -71,8 +70,7 @@ func (h *RealEstateServiceImpl) DeleteRealEstate(id int) error {
 func (h *RealEstateServiceImpl) GetRealEstate(id int) (*dto.RealEstateResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo real estate get all")
 	}
 	response := dto.ToRealEstateResponseDTO(*data)
 
@@ -86,8 +84,7 @@ func (h *RealEstateServiceImpl) GetRealEstatebyItemId(id int) (*dto.RealEstateRe
 	curr := 1
 	data, _, err := h.repo.GetAll(&curr, &curr, &cond)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo real estate get all")
 	}
 	response := dto.RealEstateResponseDTO{}
 
@@ -102,8 +99,7 @@ func (h *RealEstateServiceImpl) GetRealEstatebyItemId(id int) (*dto.RealEstateRe
 func (h *RealEstateServiceImpl) GetRealEstateList(input dto.GetRealEstateListInput) ([]dto.RealEstateResponseDTO, *uint64, error) {
 	data, total, err := h.repo.GetAll(input.Page, input.Size, nil)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo real estate get all")
 	}
 	response := dto.ToRealEstateListResponseDTO(data)
 

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	up "github.com/upper/db/v4"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 )
 
 // RealEstate struct
@@ -46,7 +47,7 @@ func (t *RealEstate) GetAll(page *int, size *int, condition *up.Cond) ([]*RealEs
 
 	total, err := res.Count()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper count")
 	}
 
 	if page != nil && size != nil {
@@ -55,7 +56,7 @@ func (t *RealEstate) GetAll(page *int, size *int, condition *up.Cond) ([]*RealEs
 
 	err = res.OrderBy("created_at desc").All(&all)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper order by")
 	}
 
 	return all, &total, nil
@@ -69,7 +70,7 @@ func (t *RealEstate) Get(id int) (*RealEstate, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper get")
 	}
 	return &one, nil
 }
@@ -81,7 +82,7 @@ func (t *RealEstate) Update(m RealEstate) error {
 	res := collection.Find(m.ID)
 	err := res.Update(&m)
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper update")
 	}
 	return nil
 }
@@ -92,7 +93,7 @@ func (t *RealEstate) Delete(id int) error {
 	res := collection.Find(id)
 	err := res.Delete()
 	if err != nil {
-		return err
+		return newErrors.Wrap(err, "upper delete")
 	}
 	return nil
 }
@@ -104,7 +105,7 @@ func (t *RealEstate) Insert(m RealEstate) (int, error) {
 	collection := Upper.Collection(t.Table())
 	res, err := collection.Insert(m)
 	if err != nil {
-		return 0, err
+		return 0, newErrors.Wrap(err, "upper insert")
 	}
 
 	id := getInsertId(res.ID())

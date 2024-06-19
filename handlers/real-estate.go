@@ -30,18 +30,21 @@ func (h *realestateHandlerImpl) CreateRealEstate(w http.ResponseWriter, r *http.
 	var input dto.RealEstateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.CreateRealEstate(input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -55,18 +58,21 @@ func (h *realestateHandlerImpl) UpdateRealEstate(w http.ResponseWriter, r *http.
 	var input dto.RealEstateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.UpdateRealEstate(id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -79,6 +85,7 @@ func (h *realestateHandlerImpl) DeleteRealEstate(w http.ResponseWriter, r *http.
 
 	err := h.service.DeleteRealEstate(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -91,6 +98,7 @@ func (h *realestateHandlerImpl) GetRealEstateById(w http.ResponseWriter, r *http
 
 	res, err := h.service.GetRealEstate(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -102,12 +110,14 @@ func (h *realestateHandlerImpl) GetRealEstateList(w http.ResponseWriter, r *http
 	var input dto.GetRealEstateListInput
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	res, total, err := h.service.GetRealEstateList(input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -120,6 +130,7 @@ func (h *realestateHandlerImpl) GetRealEstatebyItemId(w http.ResponseWriter, r *
 
 	res, err := h.service.GetRealEstatebyItemId(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

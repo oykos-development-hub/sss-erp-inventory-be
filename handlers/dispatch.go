@@ -32,12 +32,14 @@ func (h *dispatchHandlerImpl) CreateDispatch(w http.ResponseWriter, r *http.Requ
 	var input dto.DispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *dispatchHandlerImpl) CreateDispatch(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *dispatchHandlerImpl) CreateDispatch(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.CreateDispatch(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,12 +73,14 @@ func (h *dispatchHandlerImpl) UpdateDispatch(w http.ResponseWriter, r *http.Requ
 	var input dto.DispatchDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -84,6 +90,7 @@ func (h *dispatchHandlerImpl) UpdateDispatch(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -93,6 +100,7 @@ func (h *dispatchHandlerImpl) UpdateDispatch(w http.ResponseWriter, r *http.Requ
 
 	res, err := h.service.UpdateDispatch(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -108,6 +116,7 @@ func (h *dispatchHandlerImpl) DeleteDispatch(w http.ResponseWriter, r *http.Requ
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -117,6 +126,7 @@ func (h *dispatchHandlerImpl) DeleteDispatch(w http.ResponseWriter, r *http.Requ
 
 	err = h.service.DeleteDispatch(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -129,6 +139,7 @@ func (h *dispatchHandlerImpl) GetDispatchById(w http.ResponseWriter, r *http.Req
 
 	res, err := h.service.GetDispatch(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -140,12 +151,14 @@ func (h *dispatchHandlerImpl) GetDispatchList(w http.ResponseWriter, r *http.Req
 	var input dto.GetDispatchListInput
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	res, total, err := h.service.GetDispatchList(&input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

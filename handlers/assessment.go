@@ -32,12 +32,14 @@ func (h *assessmentHandlerImpl) CreateAssessment(w http.ResponseWriter, r *http.
 	var input dto.AssessmentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -47,6 +49,7 @@ func (h *assessmentHandlerImpl) CreateAssessment(w http.ResponseWriter, r *http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -56,6 +59,7 @@ func (h *assessmentHandlerImpl) CreateAssessment(w http.ResponseWriter, r *http.
 
 	res, err := h.service.CreateAssessment(ctx, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -69,12 +73,14 @@ func (h *assessmentHandlerImpl) UpdateAssessment(w http.ResponseWriter, r *http.
 	var input dto.AssessmentDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
@@ -84,6 +90,7 @@ func (h *assessmentHandlerImpl) UpdateAssessment(w http.ResponseWriter, r *http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -93,6 +100,7 @@ func (h *assessmentHandlerImpl) UpdateAssessment(w http.ResponseWriter, r *http.
 
 	res, err := h.service.UpdateAssessment(ctx, id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -108,6 +116,7 @@ func (h *assessmentHandlerImpl) DeleteAssessment(w http.ResponseWriter, r *http.
 	userID, err := strconv.Atoi(userIDString)
 
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
 		return
 	}
@@ -117,6 +126,7 @@ func (h *assessmentHandlerImpl) DeleteAssessment(w http.ResponseWriter, r *http.
 
 	err = h.service.DeleteAssessment(ctx, id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -129,6 +139,7 @@ func (h *assessmentHandlerImpl) GetAssessmentById(w http.ResponseWriter, r *http
 
 	res, err := h.service.GetAssessment(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -139,6 +150,7 @@ func (h *assessmentHandlerImpl) GetAssessmentById(w http.ResponseWriter, r *http
 func (h *assessmentHandlerImpl) GetAssessmentList(w http.ResponseWriter, r *http.Request) {
 	res, err := h.service.GetAssessmentList()
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -151,6 +163,7 @@ func (h *assessmentHandlerImpl) GetAssessmentbyItemId(w http.ResponseWriter, r *
 
 	res, total, err := h.service.GetAssessmentbyItemId(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

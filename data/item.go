@@ -10,6 +10,7 @@ import (
 	"github.com/lib/pq"
 	up "github.com/upper/db/v4"
 	"gitlab.sudovi.me/erp/inventory-api/contextutil"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 )
 
 // Item struct
@@ -111,7 +112,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 	}
 	rows, err := Upper.SQL().Query(query)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows.Close()
 
@@ -120,12 +121,12 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		err = rows.Scan(&itemID)
 
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "upper scan")
 		}
 
 		item, err := t.Get(itemID)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "item get")
 		}
 
 		items = append(items, item)
@@ -139,7 +140,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 
 	rows, err = Upper.SQL().Query(query)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows.Close()
 
@@ -149,7 +150,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 		err = rows.Scan(&count)
 
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, newErrors.Wrap(err, "upper scan")
 		}
 
 		total = uint64(count)
@@ -473,7 +474,7 @@ func (t *Item) Get(id int) (*Item, error) {
 	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&one)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper get")
 	}
 	return &one, nil
 }
@@ -483,20 +484,21 @@ func (t *Item) Update(ctx context.Context, m Item) error {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := errors.New("user ID not found in context")
+		return newErrors.Wrap(err, "context get user id")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(m.ID)
 		if err := res.Update(&m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper update")
 		}
 
 		return nil
@@ -512,19 +514,20 @@ func (t *Item) Update(ctx context.Context, m Item) error {
 func (t *Item) Delete(ctx context.Context, id int) error {
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return errors.New("user ID not found in context")
+		err := errors.New("user ID not found in context")
+		return newErrors.Wrap(err, "context get user id")
 	}
 
 	err := Upper.Tx(func(sess up.Session) error {
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
 		res := collection.Find(id)
 		if err := res.Delete(); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper delete")
 		}
 
 		return nil
@@ -542,7 +545,8 @@ func (t *Item) Insert(ctx context.Context, m Item) (int, error) {
 	m.UpdatedAt = time.Now()
 	userID, ok := contextutil.GetUserIDFromContext(ctx)
 	if !ok {
-		return 0, errors.New("user ID not found in context")
+		err := errors.New("user ID not found in context")
+		return 0, newErrors.Wrap(err, "context get user id")
 	}
 
 	var id int
@@ -551,7 +555,7 @@ func (t *Item) Insert(ctx context.Context, m Item) (int, error) {
 
 		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
 		if _, err := sess.SQL().Exec(query); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper exec")
 		}
 
 		collection := sess.Collection(t.Table())
@@ -560,7 +564,7 @@ func (t *Item) Insert(ctx context.Context, m Item) (int, error) {
 		var err error
 
 		if res, err = collection.Insert(m); err != nil {
-			return err
+			return newErrors.Wrap(err, "upper insert")
 		}
 
 		id = getInsertId(res.ID())
@@ -583,7 +587,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 
 	rows, err := Upper.SQL().Query(query1, id)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows.Close()
 
@@ -591,7 +595,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 		var item ItemInOrganizationUnit
 		err = rows.Scan(&item.ItemID, &item.ReversID)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper scan")
 		}
 
 		query2 := `select d.id from dispatches d, dispatch_items i 
@@ -599,14 +603,14 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 				 and d.id = i.dispatch_id order by d.id;`
 		rowDispatch, err := Upper.SQL().Query(query2, item.ReversID, item.ItemID)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rowDispatch.Close()
 
 		for rowDispatch.Next() {
 			err = rowDispatch.Scan(&item.ReturnID)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 
 			query3 := `select d.id from items i, dispatches d, dispatch_items di 
@@ -615,7 +619,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 			`
 			rowMedium, err := Upper.SQL().Query(query3, item.ItemID, item.ReversID, item.ReturnID)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper exec")
 			}
 			defer rowMedium.Close()
 
@@ -623,7 +627,7 @@ func (t *Item) GetAllInOrgUnit(id int) ([]ItemInOrganizationUnit, error) {
 				var id int
 				err = rowMedium.Scan(&id)
 				if err != nil {
-					return nil, err
+					return nil, newErrors.Wrap(err, "upper scan")
 				}
 				item.MovementsID = append(item.MovementsID, id)
 			}
@@ -660,7 +664,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	rows1, err := Upper.SQL().Query(query1, *organizationUnitID, *date)
 	if err != nil {
-		return nil, err
+		return nil, newErrors.Wrap(err, "upper exec")
 	}
 	defer rows1.Close()
 
@@ -670,7 +674,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		var isDonation bool
 		err = rows1.Scan(&item.ID, &sourceTypeQuery, &isDonation)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper scan")
 		}
 		//checks was item donation
 		query3 := ` SELECT i.id
@@ -680,7 +684,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 		rows3, err := Upper.SQL().Query(query3, item.ID, *date)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows3.Close()
 
@@ -689,7 +693,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows3.Next() {
 			err = rows3.Scan(&donationID)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 		}
 
@@ -764,7 +768,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	for _, item := range items {
 		rows4, err := Upper.SQL().Query(query4, *date, item.ID)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows4.Close()
 
@@ -772,7 +776,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows4.Next() {
 			err = rows4.Scan(&officeIDQuery)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 		}
 		if officeID == nil || (*officeID == officeIDQuery) {
@@ -799,7 +803,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	for i := 0; i < len(items); i++ {
 		rows5, err := Upper.SQL().Query(query5, *date, items[i].ID)
 		if err != nil {
-			return nil, err
+			return nil, newErrors.Wrap(err, "upper exec")
 		}
 		defer rows5.Close()
 
@@ -809,7 +813,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
 				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase, &items[i].OfficeID, &items[i].LostValue)
 			if err != nil {
-				return nil, err
+				return nil, newErrors.Wrap(err, "upper scan")
 			}
 			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
 			/*depreciationRate := 100 / estimatedDuration

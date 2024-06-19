@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
-	"gitlab.sudovi.me/erp/inventory-api/errors"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
@@ -28,12 +28,12 @@ func (h *LogServiceImpl) CreateLog(input dto.LogDTO) (*dto.LogResponseDTO, error
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo log insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo log get")
 	}
 
 	res := dto.ToLogResponseDTO(*data)
@@ -47,12 +47,12 @@ func (h *LogServiceImpl) UpdateLog(id int, input dto.LogDTO) (*dto.LogResponseDT
 
 	err := h.repo.Update(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo log update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo log get")
 	}
 
 	response := dto.ToLogResponseDTO(*data)
@@ -63,8 +63,7 @@ func (h *LogServiceImpl) UpdateLog(id int, input dto.LogDTO) (*dto.LogResponseDT
 func (h *LogServiceImpl) DeleteLog(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo log delete")
 	}
 
 	return nil
@@ -73,8 +72,7 @@ func (h *LogServiceImpl) DeleteLog(id int) error {
 func (h *LogServiceImpl) GetLog(id int) (*dto.LogResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo log get all")
 	}
 	response := dto.ToLogResponseDTO(*data)
 
@@ -123,8 +121,7 @@ func (h *LogServiceImpl) GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseD
 
 	data, total, err := h.repo.GetAll(filter.Page, filter.Size, conditionAndExp, orders)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo log get all")
 	}
 	response := dto.ToLogListResponseDTO(data)
 

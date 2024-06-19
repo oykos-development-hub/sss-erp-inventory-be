@@ -30,18 +30,21 @@ func (h *dispatchitemHandlerImpl) CreateDispatchItem(w http.ResponseWriter, r *h
 	var input dto.DispatchItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.CreateDispatchItem(input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -55,18 +58,21 @@ func (h *dispatchitemHandlerImpl) UpdateDispatchItem(w http.ResponseWriter, r *h
 	var input dto.DispatchItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.UpdateDispatchItem(id, input)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -79,6 +85,7 @@ func (h *dispatchitemHandlerImpl) DeleteDispatchItem(w http.ResponseWriter, r *h
 
 	err := h.service.DeleteDispatchItem(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -91,6 +98,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByItemId(w http.ResponseWri
 
 	res, err := h.service.GetDispatchItemList(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -103,6 +111,7 @@ func (h *dispatchitemHandlerImpl) GetItemsByDispatch(w http.ResponseWriter, r *h
 
 	res, err := h.service.GetItemListOfDispatch(id)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
@@ -114,18 +123,21 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWri
 	var input dto.DispatchItemStatus
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
-		_ = h.App.WriteErrorResponse(w, http.StatusBadRequest, err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
 	}
 
 	res, err := h.service.GetDispatchItemListbyStatus(input.Type, input.DispatchID)
 	if err != nil {
+		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
 	}

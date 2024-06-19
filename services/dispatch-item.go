@@ -3,7 +3,7 @@ package services
 import (
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
-	"gitlab.sudovi.me/erp/inventory-api/errors"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 )
@@ -27,12 +27,12 @@ func (h *DispatchItemServiceImpl) CreateDispatchItem(input dto.DispatchItemDTO) 
 
 	id, err := h.repo.Insert(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item get")
 	}
 
 	res := dto.ToDispatchItemResponseDTO(*data)
@@ -46,12 +46,12 @@ func (h *DispatchItemServiceImpl) UpdateDispatchItem(id int, input dto.DispatchI
 
 	err := h.repo.Update(*data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item get")
 	}
 
 	response := dto.ToDispatchItemResponseDTO(*data)
@@ -62,8 +62,7 @@ func (h *DispatchItemServiceImpl) UpdateDispatchItem(id int, input dto.DispatchI
 func (h *DispatchItemServiceImpl) DeleteDispatchItem(id int) error {
 	err := h.repo.Delete(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo dispatch item delete")
 	}
 
 	return nil
@@ -72,8 +71,7 @@ func (h *DispatchItemServiceImpl) DeleteDispatchItem(id int) error {
 func (h *DispatchItemServiceImpl) GetDispatchItemList(id int) ([]dto.DispatchItemResponseDTO, error) {
 	data, err := h.repo.GetAll(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item get all")
 	}
 	response := dto.ToDispatchItemListResponseDTO(data)
 
@@ -83,16 +81,14 @@ func (h *DispatchItemServiceImpl) GetDispatchItemList(id int) ([]dto.DispatchIte
 func (h *DispatchItemServiceImpl) GetItemListOfDispatch(dispatchID int) ([]dto.ItemResponseDTO, error) {
 	dispatchItems, err := h.repo.GetItemListOfDispatch(dispatchID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item get all")
 	}
 
 	var items []*data.Item
 	for _, dispatchItem := range dispatchItems {
 		item, err := h.itemRepo.Get(dispatchItem.InventoryId)
 		if err != nil {
-			h.App.ErrorLog.Println(err)
-			return nil, errors.ErrInternalServer
+			return nil, newErrors.Wrap(err, "repo dispatches get")
 		}
 		items = append(items, item)
 	}
@@ -104,8 +100,7 @@ func (h *DispatchItemServiceImpl) GetItemListOfDispatch(dispatchID int) ([]dto.I
 func (h *DispatchItemServiceImpl) GetDispatchItemListbyStatus(Type *string, DispatchID *int) ([]dto.DispatchItemResponseDTO, error) {
 	data, err := h.repo.GetAllInv(Type, DispatchID)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo dispatch item get all")
 	}
 	response := dto.ToDispatchItemListResponseDTO(data)
 

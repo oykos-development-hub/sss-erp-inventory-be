@@ -9,6 +9,8 @@ import (
 
 	"github.com/oykos-development-hub/celeritas"
 	up "github.com/upper/db/v4"
+
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 )
 
 type AssessmentServiceImpl struct {
@@ -28,12 +30,12 @@ func (h *AssessmentServiceImpl) CreateAssessment(ctx context.Context, input dto.
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo assessments insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo assessments get")
 	}
 
 	res := dto.ToAssessmentResponseDTO(*data)
@@ -47,12 +49,12 @@ func (h *AssessmentServiceImpl) UpdateAssessment(ctx context.Context, id int, in
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo assessments update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo assessments get")
 	}
 
 	response := dto.ToAssessmentResponseDTO(*data)
@@ -63,8 +65,7 @@ func (h *AssessmentServiceImpl) UpdateAssessment(ctx context.Context, id int, in
 func (h *AssessmentServiceImpl) DeleteAssessment(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo assessments delete")
 	}
 
 	return nil
@@ -73,8 +74,7 @@ func (h *AssessmentServiceImpl) DeleteAssessment(ctx context.Context, id int) er
 func (h *AssessmentServiceImpl) GetAssessment(id int) (*dto.AssessmentResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo assessments get")
 	}
 	response := dto.ToAssessmentResponseDTO(*data)
 
@@ -84,8 +84,7 @@ func (h *AssessmentServiceImpl) GetAssessment(id int) (*dto.AssessmentResponseDT
 func (h *AssessmentServiceImpl) GetAssessmentList() ([]dto.AssessmentResponseDTO, error) {
 	data, _, err := h.repo.GetAll(nil, nil, nil)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo assessments get all")
 	}
 	response := dto.ToAssessmentListResponseDTO(data)
 
@@ -100,12 +99,12 @@ func (h *AssessmentServiceImpl) GetAssessmentbyItemId(id int) ([]dto.AssessmentR
 	data, total, err := h.repo.GetAll(nil, nil, &cond)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(err, "repo assessments get all")
 	}
 
 	if len(data) == 0 {
 		//response = dto.ToAssessmentResponseDTO(*data[0])
-		return nil, nil, errors.ErrNotFound
+		return nil, nil, newErrors.Wrap(errors.ErrNotFound, "repo assessments get all")
 	}
 
 	response := dto.ToAssessmentListResponseDTO(data)

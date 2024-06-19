@@ -5,7 +5,7 @@ import (
 
 	"gitlab.sudovi.me/erp/inventory-api/data"
 	"gitlab.sudovi.me/erp/inventory-api/dto"
-	"gitlab.sudovi.me/erp/inventory-api/errors"
+	newErrors "gitlab.sudovi.me/erp/inventory-api/pkg/errors"
 
 	"github.com/oykos-development-hub/celeritas"
 )
@@ -27,12 +27,12 @@ func (h *ItemServiceImpl) CreateItem(ctx context.Context, input dto.ItemDTO) (*d
 
 	id, err := h.repo.Insert(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item insert")
 	}
 
 	data, err = data.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item get")
 	}
 
 	res := dto.ToItemResponseDTO(*data)
@@ -46,12 +46,12 @@ func (h *ItemServiceImpl) UpdateItem(ctx context.Context, id int, input dto.Item
 
 	err := h.repo.Update(ctx, *data)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item update")
 	}
 
 	data, err = h.repo.Get(id)
 	if err != nil {
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item get")
 	}
 
 	response := dto.ToItemResponseDTO(*data)
@@ -62,8 +62,7 @@ func (h *ItemServiceImpl) UpdateItem(ctx context.Context, id int, input dto.Item
 func (h *ItemServiceImpl) DeleteItem(ctx context.Context, id int) error {
 	err := h.repo.Delete(ctx, id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return errors.ErrInternalServer
+		return newErrors.Wrap(err, "repo item delete")
 	}
 
 	return nil
@@ -73,7 +72,7 @@ func (h *ItemServiceImpl) GetItem(id int) (*dto.ItemResponseDTO, error) {
 	data, err := h.repo.Get(id)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrNotFound
+		return nil, newErrors.Wrap(err, "repo item get all")
 	}
 	response := dto.ToItemResponseDTO(*data)
 
@@ -109,8 +108,7 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 
 	data, total, err := h.repo.GetAll(filterOnData)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, nil, errors.ErrInternalServer
+		return nil, nil, newErrors.Wrap(err, "repo item item get all")
 	}
 
 	response := dto.ToItemListResponseDTO(data)
@@ -120,8 +118,7 @@ func (h *ItemServiceImpl) GetItemList(filter dto.InventoryItemFilter) ([]dto.Ite
 func (h *ItemServiceImpl) GetItemListInOrganizationUnit(id int) ([]data.ItemInOrganizationUnit, error) {
 	data, err := h.repo.GetAllInOrgUnit(id)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item get all in org unit")
 	}
 
 	return data, nil
@@ -130,8 +127,7 @@ func (h *ItemServiceImpl) GetItemListInOrganizationUnit(id int) ([]data.ItemInOr
 func (h *ItemServiceImpl) GetItemListForReport(input dto.ItemReportFilterDTO) ([]data.ItemReportResponse, error) {
 	data, err := h.repo.GetAllForReport(input.Type, input.SourceType, input.OrganizationUnitID, input.OfficeID, input.Date)
 	if err != nil {
-		h.App.ErrorLog.Println(err)
-		return nil, errors.ErrInternalServer
+		return nil, newErrors.Wrap(err, "repo item get all for report")
 	}
 
 	return data, nil
