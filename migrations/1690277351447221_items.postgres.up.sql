@@ -43,5 +43,5 @@ CREATE TABLE IF NOT EXISTS items (
     donation_description TEXT,
     donation_files INTEGER[],
     is_external_donation BOOLEAN,
-    owner TEXT,
-)
+    owner TEXT
+);
