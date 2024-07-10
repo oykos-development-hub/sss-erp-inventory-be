@@ -65,3 +65,11 @@ type LogService interface {
 	GetLog(id int) (*dto.LogResponseDTO, error)
 	GetLogList(filter dto.LogFilterDTO) ([]dto.LogResponseDTO, *uint64, error)
 }
+
+type ErrorLogService interface {
+	CreateErrorLog(err error)
+	UpdateErrorLog(id int, input dto.ErrorLogDTO) (*dto.ErrorLogResponseDTO, error)
+	DeleteErrorLog(id int) error
+	GetErrorLog(id int) (*dto.ErrorLogResponseDTO, error)
+	GetErrorLogList(filter dto.ErrorLogFilterDTO) ([]dto.ErrorLogResponseDTO, *uint64, error)
+}

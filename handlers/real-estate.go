@@ -14,15 +14,17 @@ import (
 
 // RealEstateHandler is a concrete type that implements RealEstateHandler
 type realestateHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.RealEstateService
+	App             *celeritas.Celeritas
+	service         services.RealEstateService
+	errorLogService services.ErrorLogService
 }
 
 // NewRealEstateHandler initializes a new RealEstateHandler with its dependencies
-func NewRealEstateHandler(app *celeritas.Celeritas, realestateService services.RealEstateService) RealEstateHandler {
+func NewRealEstateHandler(app *celeritas.Celeritas, realestateService services.RealEstateService, errorLogService services.ErrorLogService) RealEstateHandler {
 	return &realestateHandlerImpl{
-		App:     app,
-		service: realestateService,
+		App:             app,
+		service:         realestateService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *realestateHandlerImpl) CreateRealEstate(w http.ResponseWriter, r *http.
 	var input dto.RealEstateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -37,6 +40,7 @@ func (h *realestateHandlerImpl) CreateRealEstate(w http.ResponseWriter, r *http.
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
@@ -44,6 +48,7 @@ func (h *realestateHandlerImpl) CreateRealEstate(w http.ResponseWriter, r *http.
 
 	res, err := h.service.CreateRealEstate(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +63,7 @@ func (h *realestateHandlerImpl) UpdateRealEstate(w http.ResponseWriter, r *http.
 	var input dto.RealEstateDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -65,6 +71,7 @@ func (h *realestateHandlerImpl) UpdateRealEstate(w http.ResponseWriter, r *http.
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
@@ -72,6 +79,7 @@ func (h *realestateHandlerImpl) UpdateRealEstate(w http.ResponseWriter, r *http.
 
 	res, err := h.service.UpdateRealEstate(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +93,7 @@ func (h *realestateHandlerImpl) DeleteRealEstate(w http.ResponseWriter, r *http.
 
 	err := h.service.DeleteRealEstate(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +107,7 @@ func (h *realestateHandlerImpl) GetRealEstateById(w http.ResponseWriter, r *http
 
 	res, err := h.service.GetRealEstate(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -110,6 +120,7 @@ func (h *realestateHandlerImpl) GetRealEstateList(w http.ResponseWriter, r *http
 	var input dto.GetRealEstateListInput
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -117,6 +128,7 @@ func (h *realestateHandlerImpl) GetRealEstateList(w http.ResponseWriter, r *http
 
 	res, total, err := h.service.GetRealEstateList(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -130,6 +142,7 @@ func (h *realestateHandlerImpl) GetRealEstatebyItemId(w http.ResponseWriter, r *
 
 	res, err := h.service.GetRealEstatebyItemId(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

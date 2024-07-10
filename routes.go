@@ -48,12 +48,17 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 		rt.Delete("/dispatch-items/{id}", handlers.DispatchItemHandler.DeleteDispatchItem)
 		rt.Get("/item/{id}/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByItemId)
 		rt.Get("/dispatch-items", handlers.DispatchItemHandler.GetDispatchItemListByStatus)
-	
+
 		rt.Post("/logs", handlers.LogHandler.CreateLog)
-rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
-rt.Get("/logs", handlers.LogHandler.GetLogList)
-rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
-rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
+		rt.Get("/logs/{id}", handlers.LogHandler.GetLogById)
+		rt.Get("/logs", handlers.LogHandler.GetLogList)
+		rt.Put("/logs/{id}", handlers.LogHandler.UpdateLog)
+		rt.Delete("/logs/{id}", handlers.LogHandler.DeleteLog)
+
+		rt.Get("/error-logs/{id}", handlers.ErrorLogHandler.GetErrorLogById)
+		rt.Get("/error-logs", handlers.ErrorLogHandler.GetErrorLogList)
+		rt.Put("/error-logs/{id}", handlers.ErrorLogHandler.UpdateErrorLog)
+		rt.Delete("/error-logs/{id}", handlers.ErrorLogHandler.DeleteErrorLog)
 	})
 
 	return app.Routes

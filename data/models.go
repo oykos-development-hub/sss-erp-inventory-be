@@ -26,7 +26,8 @@ type Models struct {
 	Dispatch     Dispatch
 	DispatchItem DispatchItem
 	Log          Log
-}
+	ErrorLog ErrorLog
+	}
 
 func New(databasePool *sql.DB) Models {
 	db = databasePool
@@ -47,6 +48,7 @@ func New(databasePool *sql.DB) Models {
 		Dispatch:     Dispatch{},
 		DispatchItem: DispatchItem{},
 		Log:          Log{},
+		ErrorLog: ErrorLog{},
 	}
 }
 

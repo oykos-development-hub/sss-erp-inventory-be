@@ -14,15 +14,17 @@ import (
 
 // DispatchItemHandler is a concrete type that implements DispatchItemHandler
 type dispatchitemHandlerImpl struct {
-	App     *celeritas.Celeritas
-	service services.DispatchItemService
+	App             *celeritas.Celeritas
+	service         services.DispatchItemService
+	errorLogService services.ErrorLogService
 }
 
 // NewDispatchItemHandler initializes a new DispatchItemHandler with its dependencies
-func NewDispatchItemHandler(app *celeritas.Celeritas, dispatchitemService services.DispatchItemService) DispatchItemHandler {
+func NewDispatchItemHandler(app *celeritas.Celeritas, dispatchitemService services.DispatchItemService, errorLogService services.ErrorLogService) DispatchItemHandler {
 	return &dispatchitemHandlerImpl{
-		App:     app,
-		service: dispatchitemService,
+		App:             app,
+		service:         dispatchitemService,
+		errorLogService: errorLogService,
 	}
 }
 
@@ -30,6 +32,7 @@ func (h *dispatchitemHandlerImpl) CreateDispatchItem(w http.ResponseWriter, r *h
 	var input dto.DispatchItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -37,6 +40,7 @@ func (h *dispatchitemHandlerImpl) CreateDispatchItem(w http.ResponseWriter, r *h
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
@@ -44,6 +48,7 @@ func (h *dispatchitemHandlerImpl) CreateDispatchItem(w http.ResponseWriter, r *h
 
 	res, err := h.service.CreateDispatchItem(input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -58,6 +63,7 @@ func (h *dispatchitemHandlerImpl) UpdateDispatchItem(w http.ResponseWriter, r *h
 	var input dto.DispatchItemDTO
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -65,6 +71,7 @@ func (h *dispatchitemHandlerImpl) UpdateDispatchItem(w http.ResponseWriter, r *h
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
@@ -72,6 +79,7 @@ func (h *dispatchitemHandlerImpl) UpdateDispatchItem(w http.ResponseWriter, r *h
 
 	res, err := h.service.UpdateDispatchItem(id, input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -85,6 +93,7 @@ func (h *dispatchitemHandlerImpl) DeleteDispatchItem(w http.ResponseWriter, r *h
 
 	err := h.service.DeleteDispatchItem(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -98,6 +107,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByItemId(w http.ResponseWri
 
 	res, err := h.service.GetDispatchItemList(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -111,6 +121,7 @@ func (h *dispatchitemHandlerImpl) GetItemsByDispatch(w http.ResponseWriter, r *h
 
 	res, err := h.service.GetItemListOfDispatch(id)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -123,6 +134,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWri
 	var input dto.DispatchItemStatus
 	err := h.App.ReadJSON(w, r, &input)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return
@@ -130,6 +142,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWri
 
 	validator := h.App.Validator().ValidateStruct(&input)
 	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
 		return
@@ -137,6 +150,7 @@ func (h *dispatchitemHandlerImpl) GetDispatchItemListByStatus(w http.ResponseWri
 
 	res, err := h.service.GetDispatchItemListbyStatus(input.Type, input.DispatchID)
 	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
 		h.App.ErrorLog.Print(err)
 		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
 		return

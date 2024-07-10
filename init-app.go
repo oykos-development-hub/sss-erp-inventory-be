@@ -29,24 +29,26 @@ func initApplication() *celeritas.Celeritas {
 
 	models := data.New(cel.DB.Pool)
 
+	ErrorLogService := services.NewErrorLogServiceImpl(cel, models.ErrorLog)
+	ErrorLogHandler := handlers.NewErrorLogHandler(cel, ErrorLogService)
+
 	RealEstateService := services.NewRealEstateServiceImpl(cel, models.RealEstate)
-	RealEstateHandler := handlers.NewRealEstateHandler(cel, RealEstateService)
+	RealEstateHandler := handlers.NewRealEstateHandler(cel, RealEstateService, ErrorLogService)
 
 	ItemService := services.NewItemServiceImpl(cel, models.Item)
-	ItemHandler := handlers.NewItemHandler(cel, ItemService)
+	ItemHandler := handlers.NewItemHandler(cel, ItemService, ErrorLogService)
 
 	DispatchService := services.NewDispatchServiceImpl(cel, models.Dispatch)
-	DispatchHandler := handlers.NewDispatchHandler(cel, DispatchService)
+	DispatchHandler := handlers.NewDispatchHandler(cel, DispatchService, ErrorLogService)
 
 	DispatchItemService := services.NewDispatchItemServiceImpl(cel, models.DispatchItem, models.Item)
-	DispatchItemHandler := handlers.NewDispatchItemHandler(cel, DispatchItemService)
+	DispatchItemHandler := handlers.NewDispatchItemHandler(cel, DispatchItemService, ErrorLogService)
 
 	AssessmentService := services.NewAssessmentServiceImpl(cel, models.Assessment)
-	AssessmentHandler := handlers.NewAssessmentHandler(cel, AssessmentService)
+	AssessmentHandler := handlers.NewAssessmentHandler(cel, AssessmentService, ErrorLogService)
 
-		
 	LogService := services.NewLogServiceImpl(cel, models.Log)
-	LogHandler := handlers.NewLogHandler(cel, LogService)
+	LogHandler := handlers.NewLogHandler(cel, LogService, ErrorLogService)
 
 	myHandlers := &handlers.Handlers{
 		RealEstateHandler:   RealEstateHandler,
@@ -54,7 +56,8 @@ func initApplication() *celeritas.Celeritas {
 		AssessmentHandler:   AssessmentHandler,
 		DispatchHandler:     DispatchHandler,
 		DispatchItemHandler: DispatchItemHandler,
-		LogHandler: LogHandler,
+		LogHandler:          LogHandler,
+		ErrorLogHandler:     ErrorLogHandler,
 	}
 
 	myMiddleware := &middleware.Middleware{
