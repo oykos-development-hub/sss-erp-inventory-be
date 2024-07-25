@@ -146,7 +146,6 @@ func (dto ItemDTO) ToItem() *data.Item {
 		DonationDescription:          dto.DonationDescription,
 		DonationFiles:                dto.DonationFiles,
 		Owner:                        dto.Owner,
-		AssessmentPrice:              dto.AssessmentPrice,
 	}
 }
 
@@ -204,7 +203,6 @@ func ToItemResponseDTO(data data.Item) ItemResponseDTO {
 		DonationDescription:          data.DonationDescription,
 		DonationFiles:                donationFiles,
 		Owner:                        data.Owner,
-		AssessmentPrice:              data.AssessmentPrice,
 	}
 }
 

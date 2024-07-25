@@ -39,7 +39,6 @@ type Item struct {
 	Amount                       int           `db:"amount"`
 	NetPrice                     *float32      `db:"net_price"`
 	GrossPrice                   float32       `db:"gross_price"`
-	AssessmentPrice              *float32      `db:"assessment_price"`
 	Description                  *string       `db:"description"`
 	DateOfPurchase               *time.Time    `db:"date_of_purchase"`
 	Inactive                     *time.Time    `db:"inactive"`
@@ -789,7 +788,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//makni obavezno office_id - zakucavanje da rade ove popisne liste njihove
 	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
-		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase, i.office_id, i.assessment_price
+		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
 		FROM items i
 		JOIN assessments a ON i.id = a.inventory_id
 		WHERE (i.id, a.id) IN (
@@ -811,12 +810,12 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			var estimatedDuration int
 			var dateOfAssessment string
 			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
-				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase, &items[i].OfficeID, &items[i].LostValue)
+				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
 			if err != nil {
 				return nil, newErrors.Wrap(err, "upper scan")
 			}
 			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
-			/*depreciationRate := 100 / estimatedDuration
+			depreciationRate := 100 / estimatedDuration
 			monthlyDepreciationRate := float32(depreciationRate) / 12
 
 			dateOfAssessmentTime, err := time.Parse(time.RFC3339, dateOfAssessment)
@@ -835,7 +834,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			if items[i].Price < 0 {
 				items[i].Price = 0
 			}
-			items[i].LostValue = items[i].ProcurementPrice - items[i].Price*/
+			items[i].LostValue = items[i].ProcurementPrice - items[i].Price
 		}
 	}
 
