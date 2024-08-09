@@ -208,7 +208,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number like '%" + *filter.InventoryNumber + "%'"
+		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -232,7 +232,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number like '" + *filter.SerialNumber + "%'"
+		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
@@ -380,7 +380,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number like '" + *filter.InventoryNumber + "%'"
+		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -404,7 +404,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number like '" + *filter.SerialNumber + "%'"
+		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
@@ -538,7 +538,7 @@ func (t *Item) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-// Insert inserts a model into the database, using Upper
+// Insert inserts a model into the database, using
 func (t *Item) Insert(ctx context.Context, m Item) (int, error) {
 	m.CreatedAt = time.Now()
 	m.UpdatedAt = time.Now()
