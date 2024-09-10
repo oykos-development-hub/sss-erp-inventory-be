@@ -208,7 +208,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
+		conditions = conditions + " and i.inventory_number = '" + *filter.InventoryNumber + "'"
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -232,7 +232,7 @@ func buildQuery(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
+		conditions = conditions + " and i.serial_number = '" + *filter.SerialNumber + "'"
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
@@ -380,7 +380,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.InventoryNumber != nil {
-		conditions = conditions + " and i.inventory_number = " + *filter.InventoryNumber
+		conditions = conditions + " and i.inventory_number = '" + *filter.InventoryNumber + "'"
 	}
 
 	if filter.IsExternalDonation != nil {
@@ -404,7 +404,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 	}
 
 	if filter.SerialNumber != nil {
-		conditions = conditions + " and i.serial_number = " + *filter.SerialNumber
+		conditions = conditions + " and i.serial_number = '" + *filter.SerialNumber + "'"
 	}
 
 	if filter.SourceOrganizationUnitID != nil {
