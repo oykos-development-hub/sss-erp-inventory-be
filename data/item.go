@@ -266,7 +266,7 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + `NOT (
+			conditions = conditions + `and NOT (
 				(d.type = 'revers' AND NOT d.is_accepted) -- "Poslato"
 				OR ((i.target_organization_unit_id != 0 AND i.target_organization_unit_id = ` + currentOrganizationUnitIDString + `)
 					 OR (d.type = 'revers' AND d.is_accepted AND i.organization_unit_id = ` + currentOrganizationUnitIDString + `)) -- "Prihvaćeno"
@@ -444,7 +444,7 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + `NOT (
+			conditions = conditions + `and NOT (
 				(d.type = 'revers' AND NOT d.is_accepted) -- "Poslato"
 				OR ((i.target_organization_unit_id != 0 AND i.target_organization_unit_id = ` + currentOrganizationUnitIDString + `)
 					 OR (d.type = 'revers' AND d.is_accepted AND i.organization_unit_id = ` + currentOrganizationUnitIDString + `)) -- "Prihvaćeno"
