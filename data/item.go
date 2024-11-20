@@ -160,7 +160,7 @@ func (t *Item) GetAll(filter InventoryItemFilter) ([]*Item, *uint64, error) {
 }
 
 func buildQuery(filter InventoryItemFilter) string {
-	selectPart := `SELECT i.id
+	selectPart := `SELECT DISTINCT(i.id)
 	FROM items i
 	LEFT JOIN (
 		SELECT MAX(d.id) AS max_dispatch_id, di.inventory_id AS inventory_id
