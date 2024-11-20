@@ -266,8 +266,11 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + ` and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
-			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
+			conditions = conditions + ` and ((i.organization_unit_id = ` + currentOrganizationUnitIDString +
+				` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) 
+			  or d.type = 'return' or d.type is null)) 
+			  or ((i.target_organization_unit_id = ` + currentOrganizationUnitIDString +
+				` and (d.type = 'revers' and d.is_accepted) or d.type = 'return'))`
 		}
 
 	}
@@ -438,8 +441,11 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + ` and (i.organization_unit_id = ` + currentOrganizationUnitIDString + ` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) or d.type = 'return' or d.type is null) 
-			or (i.target_organization_unit_id = ` + currentOrganizationUnitIDString + ` and (d.type = 'revers' and d.is_accepted) or d.type = 'return' )`
+			conditions = conditions + ` and ((i.organization_unit_id = ` + currentOrganizationUnitIDString +
+				` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) 
+			  or d.type = 'return' or d.type is null)) 
+			  or ((i.target_organization_unit_id = ` + currentOrganizationUnitIDString +
+				` and (d.type = 'revers' and d.is_accepted) or d.type = 'return'))`
 		}
 
 	}
