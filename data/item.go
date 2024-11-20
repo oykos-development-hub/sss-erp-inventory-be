@@ -266,11 +266,11 @@ func buildQuery(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + ` and ((i.organization_unit_id = ` + currentOrganizationUnitIDString +
-				` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) 
-			  or d.type = 'return' or d.type is null)) 
-			  or ((i.target_organization_unit_id = ` + currentOrganizationUnitIDString +
-				` and (d.type = 'revers' and d.is_accepted) or d.type = 'return'))`
+			conditions = conditions + `AND NOT (d.type = 'revers' AND NOT d.is_accepted)
+			OR ((i.target_organization_unit_id != 0 AND i.target_organization_unit_id != ` + currentOrganizationUnitIDString + `)
+				OR (d.type = 'revers' AND d.is_accepted AND i.organization_unit_id = ` + currentOrganizationUnitIDString + `))
+			OR d.type = 'allocation'
+			OR (d.type = 'return-revers' AND d.source_organization_unit_id = ` + currentOrganizationUnitIDString + `)`
 		}
 
 	}
@@ -441,11 +441,11 @@ func buildQueryForTotal(filter InventoryItemFilter) string {
 		case "Povraćaj":
 			conditions = conditions + " and d.is_accepted = false and  d.type = 'return-revers' and d.source_organization_unit_id = " + currentOrganizationUnitIDString
 		case "Nezaduženo":
-			conditions = conditions + ` and ((i.organization_unit_id = ` + currentOrganizationUnitIDString +
-				` and i.target_organization_unit_id <> 0 and (d.type = 'return-revers' and d.is_accepted) 
-			  or d.type = 'return' or d.type is null)) 
-			  or ((i.target_organization_unit_id = ` + currentOrganizationUnitIDString +
-				` and (d.type = 'revers' and d.is_accepted) or d.type = 'return'))`
+			conditions = conditions + `AND NOT (d.type = 'revers' AND NOT d.is_accepted)
+			OR ((i.target_organization_unit_id != 0 AND i.target_organization_unit_id != ` + currentOrganizationUnitIDString + `)
+				OR (d.type = 'revers' AND d.is_accepted AND i.organization_unit_id = ` + currentOrganizationUnitIDString + `))
+			OR d.type = 'allocation'
+			OR (d.type = 'return-revers' AND d.source_organization_unit_id = ` + currentOrganizationUnitIDString + `)`
 		}
 
 	}
