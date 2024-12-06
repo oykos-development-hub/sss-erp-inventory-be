@@ -239,6 +239,16 @@ type ItemReportFilterDTO struct {
 	Date               *string `json:"date"`
 }
 
+type ExcelItemDTO struct {
+	Article            ItemDTO         `json:"article"`
+	FirstAmortization  AssessmentDTO   `json:"first_amortization"`
+	SecondAmortization AssessmentDTO   `json:"second_amortization"`
+	Dispatch           DispatchDTO     `json:"dispatch"`
+	ReversDispatch     DispatchDTO     `json:"revers_dispatch"`
+	DispatchItem       DispatchItemDTO `json:"dispatch_item"`
+	ReversDispatchItem DispatchItemDTO `json:"revers_dispatch_item"`
+}
+
 func ToItemListResponseDTO(items []*data.Item) []ItemResponseDTO {
 	dtoList := make([]ItemResponseDTO, len(items))
 	for i, x := range items {

@@ -94,6 +94,16 @@ type ItemInOrganizationUnit struct {
 	MovementsID []int `json:"movements_id"`
 }
 
+type ExcelItem struct {
+	Article            Item         `json:"article"`
+	FirstAmortization  Assessment   `json:"first_amortization"`
+	SecondAmortization Assessment   `json:"second_amortization"`
+	Dispatch           Dispatch     `json:"dispatch"`
+	ReversDispatch     Dispatch     `json:"revers_dispatch"`
+	DispatchItem       DispatchItem `json:"dispatch_item"`
+	ReversDispatchItem DispatchItem `json:"revers_dispatch_item"`
+}
+
 // Table returns the table name
 func (t *Item) Table() string {
 	return "items"
@@ -851,4 +861,86 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 	}
 
 	return items, err
+}
+
+func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		err := errors.New("user ID not found in context")
+		return newErrors.Wrap(err, "context get user id")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return newErrors.Wrap(err, "upper exec")
+		}
+
+		collectionItems := sess.Collection(t.Table())
+		collectionAssessments := sess.Collection("assessments")
+		collectionDispatches := sess.Collection("dispatches")
+		collectionDispatchItems := sess.Collection("dispatch_items")
+
+		for _, item := range items {
+			var res up.InsertResult
+			var err error
+
+			if res, err = collectionItems.Insert(item.Article); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert article")
+			}
+
+			id := getInsertId(res.ID())
+
+			item.FirstAmortization.InventoryID = id
+
+			if _, err = collectionAssessments.Insert(item.FirstAmortization); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert first amortization")
+			}
+
+			if item.SecondAmortization.GrossPriceDifference != 0 {
+				item.SecondAmortization.InventoryID = id
+
+				if _, err = collectionAssessments.Insert(item.SecondAmortization); err != nil {
+					return newErrors.Wrap(err, "upper insert - insert second amortization")
+				}
+			}
+
+			if item.ReversDispatch.TargetOrganizationUnitID != 0 {
+				var resDispatch up.InsertResult
+				if resDispatch, err = collectionDispatches.Insert(item.ReversDispatch); err != nil {
+					return newErrors.Wrap(err, "upper insert - insert revers dispatch")
+				}
+
+				resDispatchID := getInsertId(resDispatch.ID())
+
+				item.ReversDispatchItem.DispatchId = resDispatchID
+				item.ReversDispatchItem.InventoryId = id
+
+				if _, err = collectionDispatchItems.Insert(item.ReversDispatchItem); err != nil {
+					return newErrors.Wrap(err, "upper insert - insert revers dispatch item")
+				}
+			}
+
+			var resDispatch up.InsertResult
+			if resDispatch, err = collectionDispatches.Insert(item.Dispatch); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert dispatch")
+			}
+
+			resDispatchID := getInsertId(resDispatch.ID())
+
+			item.DispatchItem.DispatchId = resDispatchID
+			item.DispatchItem.InventoryId = id
+
+			if _, err = collectionDispatchItems.Insert(item.DispatchItem); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert dispatch item")
+			}
+
+		}
+
+		return nil
+	})
+
+	return err
 }

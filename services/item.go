@@ -40,6 +40,40 @@ func (h *ItemServiceImpl) CreateItem(ctx context.Context, input dto.ItemDTO) (*d
 	return &res, nil
 }
 
+func (h *ItemServiceImpl) CreateExcelItem(ctx context.Context, input []dto.ExcelItemDTO) error {
+
+	var items []data.ExcelItem
+
+	for _, item := range input {
+		var excelItem data.ExcelItem
+
+		excelItemArticle := item.Article.ToItem()
+		excelItem.Article = *excelItemArticle
+
+		excelItemFirstAmortization := item.FirstAmortization.ToAssessment()
+		excelItem.FirstAmortization = *excelItemFirstAmortization
+
+		excelItemSecondAmortization := item.SecondAmortization.ToAssessment()
+		excelItem.SecondAmortization = *excelItemSecondAmortization
+
+		excelItemDispatch := item.Dispatch.ToDispatch()
+		excelItem.Dispatch = *excelItemDispatch
+
+		excelItemReversDispatch := item.ReversDispatch.ToDispatch()
+		excelItem.ReversDispatch = *excelItemReversDispatch
+
+		excelItemDispatchItem := item.DispatchItem.ToDispatchItem()
+		excelItem.DispatchItem = *excelItemDispatchItem
+
+		excelItemReversDispatchItem := item.ReversDispatchItem.ToDispatchItem()
+		excelItem.ReversDispatchItem = *excelItemReversDispatchItem
+
+		items = append(items, excelItem)
+	}
+
+	return h.repo.CreateExcelItem(ctx, items)
+}
+
 func (h *ItemServiceImpl) UpdateItem(ctx context.Context, id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
 	data := input.ToItem()
 	data.ID = id

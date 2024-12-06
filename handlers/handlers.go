@@ -25,6 +25,7 @@ type RealEstateHandler interface {
 
 type ItemHandler interface {
 	CreateItem(w http.ResponseWriter, r *http.Request)
+	CreateExcelItem(w http.ResponseWriter, r *http.Request)
 	UpdateItem(w http.ResponseWriter, r *http.Request)
 	DeleteItem(w http.ResponseWriter, r *http.Request)
 	GetItemById(w http.ResponseWriter, r *http.Request)

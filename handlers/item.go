@@ -73,6 +73,49 @@ func (h *itemHandlerImpl) CreateItem(w http.ResponseWriter, r *http.Request) {
 	_ = h.App.WriteDataResponse(w, http.StatusOK, "Item created successfuly", res)
 }
 
+func (h *itemHandlerImpl) CreateExcelItem(w http.ResponseWriter, r *http.Request) {
+	var input []dto.ExcelItemDTO
+	err := h.App.ReadJSON(w, r, &input)
+	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	validator := h.App.Validator().ValidateStruct(&input)
+	if !validator.Valid() {
+		h.errorLogService.CreateErrorLog(err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponseWithData(w, errors.MapErrorToStatusCode(errors.ErrBadRequest), errors.ErrBadRequest, validator.Errors)
+		return
+	}
+
+	userIDString := r.Header.Get("UserID")
+
+	userID, err := strconv.Atoi(userIDString)
+
+	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(errors.ErrUnauthorized), errors.ErrUnauthorized)
+		return
+	}
+
+	ctx := context.Background()
+	ctx = contextutil.SetUserIDInContext(ctx, userID)
+
+	err = h.service.CreateExcelItem(ctx, input)
+	if err != nil {
+		h.errorLogService.CreateErrorLog(err)
+		h.App.ErrorLog.Print(err)
+		_ = h.App.WriteErrorResponse(w, errors.MapErrorToStatusCode(err), err)
+		return
+	}
+
+	_ = h.App.WriteSuccessResponse(w, http.StatusOK, "Item created successfuly")
+}
+
 func (h *itemHandlerImpl) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 
