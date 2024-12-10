@@ -831,14 +831,11 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows5.Next() {
 			var estimatedDuration int
 			var dateOfAssessment string
-			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
+			err = rows5.Scan(&items[i].ID, &items[i].InventoryNumber, &items[i].ProcurementPrice,
 				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
 			if err != nil {
 				return nil, newErrors.Wrap(err, "upper scan")
 			}
-			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
-			depreciationRate := 100 / estimatedDuration
-			monthlyDepreciationRate := float32(depreciationRate) / 12
 
 			dateOfAssessmentTime, err := time.Parse(time.RFC3339, dateOfAssessment)
 			if err != nil {
@@ -848,15 +845,31 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 			if err != nil {
 				return nil, err
 			}
-			sub := dateTime.Sub(dateOfAssessmentTime)
-			months := sub.Hours() / 24 / 30
-			monthsInt := int(months)
 
-			items[i].Price = items[i].ProcurementPrice - float32(monthsInt)*(items[i].ProcurementPrice*monthlyDepreciationRate/100)
-			if items[i].Price < 0 {
-				items[i].Price = 0
+			years := dateTime.Year() - dateOfAssessmentTime.Year()
+			months := int(dateTime.Month()) - int(dateOfAssessmentTime.Month())
+			if months < 0 {
+				years--
+				months += 12
 			}
-			items[i].LostValue = items[i].ProcurementPrice - items[i].Price
+
+			months = years*12 + months
+
+			totalConsumption := float32(0)
+			var percentage float32
+			if estimatedDuration == 0 {
+				percentage = 0.0000000001
+			} else {
+				percentage = float32(100) / float32(estimatedDuration)
+			}
+
+			monthlyConsumption := items[i].ProcurementPrice * percentage / 100 / 12
+			for i := 0; i < months; i++ {
+				totalConsumption += monthlyConsumption
+			}
+
+			items[i].LostValue = totalConsumption
+			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
 		}
 	}
 
