@@ -887,6 +887,8 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 			var res up.InsertResult
 			var err error
 
+			item.Article.CreatedAt = time.Now()
+
 			if res, err = collectionItems.Insert(item.Article); err != nil {
 				return newErrors.Wrap(err, "upper insert - insert article")
 			}
@@ -894,12 +896,14 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 			id := getInsertId(res.ID())
 
 			item.FirstAmortization.InventoryID = id
+			item.FirstAmortization.CreatedAt = time.Now()
 
 			if _, err = collectionAssessments.Insert(item.FirstAmortization); err != nil {
 				return newErrors.Wrap(err, "upper insert - insert first amortization")
 			}
 
 			if item.SecondAmortization.GrossPriceDifference != 0 {
+				item.SecondAmortization.CreatedAt = time.Now()
 				item.SecondAmortization.InventoryID = id
 
 				if _, err = collectionAssessments.Insert(item.SecondAmortization); err != nil {
@@ -909,6 +913,7 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 
 			if item.ReversDispatch.TargetOrganizationUnitID != 0 {
 				var resDispatch up.InsertResult
+				item.ReversDispatch.CreatedAt = time.Now()
 				if resDispatch, err = collectionDispatches.Insert(item.ReversDispatch); err != nil {
 					return newErrors.Wrap(err, "upper insert - insert revers dispatch")
 				}
@@ -924,6 +929,7 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 			}
 
 			var resDispatch up.InsertResult
+			item.Dispatch.CreatedAt = time.Now()
 			if resDispatch, err = collectionDispatches.Insert(item.Dispatch); err != nil {
 				return newErrors.Wrap(err, "upper insert - insert dispatch")
 			}
