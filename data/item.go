@@ -831,7 +831,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows5.Next() {
 			var estimatedDuration int
 			var dateOfAssessment string
-			err = rows5.Scan(&items[i].ID, &items[i].InventoryNumber, &items[i].ProcurementPrice,
+			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
 				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
 			if err != nil {
 				return nil, newErrors.Wrap(err, "upper scan")
