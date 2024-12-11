@@ -949,21 +949,21 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 				if _, err = collectionDispatchItems.Insert(item.ReversDispatchItem); err != nil {
 					return newErrors.Wrap(err, "upper insert - insert revers dispatch item")
 				}
-			}
+			} else {
+				var resDispatch up.InsertResult
+				item.Dispatch.CreatedAt = time.Now()
+				if resDispatch, err = collectionDispatches.Insert(item.Dispatch); err != nil {
+					return newErrors.Wrap(err, "upper insert - insert dispatch")
+				}
 
-			var resDispatch up.InsertResult
-			item.Dispatch.CreatedAt = time.Now()
-			if resDispatch, err = collectionDispatches.Insert(item.Dispatch); err != nil {
-				return newErrors.Wrap(err, "upper insert - insert dispatch")
-			}
+				resDispatchID := getInsertId(resDispatch.ID())
 
-			resDispatchID := getInsertId(resDispatch.ID())
+				item.DispatchItem.DispatchId = resDispatchID
+				item.DispatchItem.InventoryId = id
 
-			item.DispatchItem.DispatchId = resDispatchID
-			item.DispatchItem.InventoryId = id
-
-			if _, err = collectionDispatchItems.Insert(item.DispatchItem); err != nil {
-				return newErrors.Wrap(err, "upper insert - insert dispatch item")
+				if _, err = collectionDispatchItems.Insert(item.DispatchItem); err != nil {
+					return newErrors.Wrap(err, "upper insert - insert dispatch item")
+				}
 			}
 
 		}
