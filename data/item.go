@@ -1011,15 +1011,11 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 				}
 			}
 
-			fmt.Println("korak 1")
-
 			if articleItem.ID != 0 {
 				_, err := Upper.SQL().Exec(queryForUpdate, articleItem.ID, item.OfficeID)
 				if err != nil {
 					return newErrors.Wrap(err, "upper exec")
 				}
-
-				fmt.Println("korak 2")
 
 				dateOfDispatch, err := time.Parse(time.RFC3339, item.DateOfDispatch)
 
@@ -1037,8 +1033,6 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 
 				var resDispatch up.InsertResult
 
-				fmt.Println("korak 3")
-
 				if resDispatch, err = collectionDispatches.Insert(dispatch); err != nil {
 					return newErrors.Wrap(err, "upper insert - insert dispatch")
 				}
@@ -1050,13 +1044,9 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 					DispatchId:  resDispatchID,
 				}
 
-				fmt.Println("korak 4")
-
 				if _, err = collectionDispatchItems.Insert(dispatchItem); err != nil {
 					return newErrors.Wrap(err, "upper insert - insert dispatch item")
 				}
-
-				fmt.Println("korak 5")
 
 				queryForDispatch := `select d.id from dispatches d left join dispatch_items di on di.dispatch_id = d.id where di.inventory_id = $1 and d.type = 'revers'`
 				queryForUpdateDispatch := `update dispatches set date = $1 where id = $2`
@@ -1067,18 +1057,14 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 				}
 				defer rows3.Close()
 
-				fmt.Println("korak 6")
-
 				var currentDispatch Dispatch
 
 				for rows3.Next() {
-					err = rows1.Scan(&currentDispatch.ID)
+					err = rows3.Scan(&currentDispatch.ID)
 					if err != nil {
 						return newErrors.Wrap(err, "upper scan")
 					}
 				}
-
-				fmt.Println("korak 7")
 
 				if currentDispatch.ID != 0 {
 					_, err := Upper.SQL().Exec(queryForUpdateDispatch, item.DateOfDispatch, currentDispatch.ID)
@@ -1087,7 +1073,6 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 					}
 				}
 
-				fmt.Println("korak 8")
 			}
 		}
 
