@@ -1012,7 +1012,7 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 			}
 
 			if articleItem.ID != 0 {
-				_, err := Upper.SQL().Exec(queryForUpdate, articleItem.ID, item.OfficeID)
+				_, err := Upper.SQL().Exec(queryForUpdate, item.OfficeID, articleItem.ID)
 				if err != nil {
 					return newErrors.Wrap(err, "upper exec")
 				}
