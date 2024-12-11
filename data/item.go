@@ -319,8 +319,6 @@ func buildQuery(filter InventoryItemFilter) string {
 		conditions = conditions + "order by i.id limit " + sizeString + " offset (" + pageString + " - 1) * " + sizeString
 	}
 
-	fmt.Println(selectPart + conditions)
-
 	return selectPart + conditions
 }
 
