@@ -870,6 +870,11 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 			items[i].LostValue = totalConsumption
 			items[i].Price = items[i].ProcurementPrice - items[i].LostValue
+
+			if items[i].Price < 0 {
+				items[i].Price = 0
+				items[i].LostValue = items[i].ProcurementPrice
+			}
 		}
 	}
 
