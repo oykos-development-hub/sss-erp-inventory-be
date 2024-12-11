@@ -857,15 +857,13 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 			totalConsumption := float32(0)
 			var percentage float32
-			if estimatedDuration == 0 {
-				percentage = 0.0000000001
-			} else {
+			if estimatedDuration != 0 {
 				percentage = float32(100) / float32(estimatedDuration)
-			}
 
-			monthlyConsumption := items[i].ProcurementPrice * percentage / 100 / 12
-			for i := 0; i < months; i++ {
-				totalConsumption += monthlyConsumption
+				monthlyConsumption := items[i].ProcurementPrice * percentage / 100 / 12
+				for i := 0; i < months; i++ {
+					totalConsumption += monthlyConsumption
+				}
 			}
 
 			items[i].LostValue = totalConsumption
