@@ -23,6 +23,7 @@ func routes(app *celeritas.Celeritas, middleware *middleware.Middleware, handler
 
 		rt.Post("/items", handlers.ItemHandler.CreateItem)
 		rt.Post("/excel-items", handlers.ItemHandler.CreateExcelItem)
+		rt.Post("/ps2-excel-items", handlers.ItemHandler.CreatePS2ExcelItem)
 		rt.Get("/items/{id}", handlers.ItemHandler.GetItemById)
 		rt.Get("/items-in-organization-unit/{id}", handlers.ItemHandler.GetItemListInOrganizationUnit)
 		rt.Get("/items-for-item-list-report", handlers.ItemHandler.GetItemListForReport)

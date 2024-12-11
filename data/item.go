@@ -104,6 +104,13 @@ type ExcelItem struct {
 	ReversDispatchItem DispatchItem `json:"revers_dispatch_item"`
 }
 
+type ExcelPS2Item struct {
+	OrganizationUnitID int    `json:"organization_unit_id"`
+	InventoryNumber    string `json:"inventory_number"`
+	OfficeID           int    `json:"office_id"`
+	DateOfDispatch     string `json:"date_of_dispatch"`
+}
+
 // Table returns the table name
 func (t *Item) Table() string {
 	return "items"
@@ -956,6 +963,89 @@ func (t *Item) CreateExcelItem(ctx context.Context, items []ExcelItem) error {
 			item.DispatchItem.InventoryId = id
 
 			if _, err = collectionDispatchItems.Insert(item.DispatchItem); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert dispatch item")
+			}
+
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) error {
+
+	userID, ok := contextutil.GetUserIDFromContext(ctx)
+	if !ok {
+		err := errors.New("user ID not found in context")
+		return newErrors.Wrap(err, "context get user id")
+	}
+
+	err := Upper.Tx(func(sess up.Session) error {
+
+		query := fmt.Sprintf("SET myapp.user_id = %d", userID)
+		if _, err := sess.SQL().Exec(query); err != nil {
+			return newErrors.Wrap(err, "upper exec")
+		}
+
+		collectionDispatches := sess.Collection("dispatches")
+		collectionDispatchItems := sess.Collection("dispatch_items")
+
+		for _, item := range items {
+			var articleItem Item
+
+			queryForItem := `select i.id from items i where i.target_organization_unit_id = $1 and i.inventory_number = $2 LIMIT 1;`
+			queryForUpdate := `update items set office_id = $1 where id = $2`
+
+			rows1, err := Upper.SQL().Query(queryForItem, item.OrganizationUnitID, item.InventoryNumber)
+			if err != nil {
+				return newErrors.Wrap(err, "upper exec")
+			}
+			defer rows1.Close()
+
+			for rows1.Next() {
+				err = rows1.Scan(&articleItem.ID)
+				if err != nil {
+					return newErrors.Wrap(err, "upper scan")
+				}
+			}
+
+			if articleItem.ID != 0 {
+				_, err := Upper.SQL().Exec(queryForUpdate, articleItem.ID, item.OfficeID)
+				if err != nil {
+					return newErrors.Wrap(err, "upper exec")
+				}
+			}
+
+			dateOfDispatch, err := time.Parse(time.RFC3339, item.DateOfDispatch)
+
+			if err != nil {
+				return newErrors.Wrap(err, "time parse")
+			}
+
+			dispatch := Dispatch{
+				Type:       "allocation",
+				IsAccepted: true,
+				OfficeID:   &item.OfficeID,
+				Date:       &dateOfDispatch,
+				CreatedAt:  time.Now(),
+			}
+
+			var resDispatch up.InsertResult
+
+			if resDispatch, err = collectionDispatches.Insert(dispatch); err != nil {
+				return newErrors.Wrap(err, "upper insert - insert dispatch")
+			}
+
+			resDispatchID := getInsertId(resDispatch.ID())
+
+			dispatchItem := DispatchItem{
+				InventoryId: articleItem.ID,
+				DispatchId:  resDispatchID,
+			}
+
+			if _, err = collectionDispatchItems.Insert(dispatchItem); err != nil {
 				return newErrors.Wrap(err, "upper insert - insert dispatch item")
 			}
 

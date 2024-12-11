@@ -25,6 +25,7 @@ type RealEstateService interface {
 type ItemService interface {
 	CreateItem(ctx context.Context, input dto.ItemDTO) (*dto.ItemResponseDTO, error)
 	CreateExcelItem(ctx context.Context, input []dto.ExcelItemDTO) error
+	CreatePS2ExcelItem(ctx context.Context, input []dto.ExcelPS2ItemDTO) error
 	UpdateItem(ctx context.Context, id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error)
 	DeleteItem(ctx context.Context, id int) error
 	GetItem(id int) (*dto.ItemResponseDTO, error)

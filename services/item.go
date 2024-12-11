@@ -74,6 +74,24 @@ func (h *ItemServiceImpl) CreateExcelItem(ctx context.Context, input []dto.Excel
 	return h.repo.CreateExcelItem(ctx, items)
 }
 
+func (h *ItemServiceImpl) CreatePS2ExcelItem(ctx context.Context, input []dto.ExcelPS2ItemDTO) error {
+
+	var items []data.ExcelPS2Item
+
+	for _, item := range input {
+		excelItem := data.ExcelPS2Item{
+			OrganizationUnitID: item.OrganizationUnitID,
+			InventoryNumber:    item.InventoryNumber,
+			OfficeID:           item.OfficeID,
+			DateOfDispatch:     item.DateOfDispatch,
+		}
+
+		items = append(items, excelItem)
+	}
+
+	return h.repo.CreatePS2ExcelItem(ctx, items)
+}
+
 func (h *ItemServiceImpl) UpdateItem(ctx context.Context, id int, input dto.ItemDTO) (*dto.ItemResponseDTO, error) {
 	data := input.ToItem()
 	data.ID = id

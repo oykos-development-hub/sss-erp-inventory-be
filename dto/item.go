@@ -249,6 +249,13 @@ type ExcelItemDTO struct {
 	ReversDispatchItem DispatchItemDTO `json:"revers_dispatch_item"`
 }
 
+type ExcelPS2ItemDTO struct {
+	OrganizationUnitID int    `json:"organization_unit_id"`
+	InventoryNumber    string `json:"inventory_number"`
+	OfficeID           int    `json:"office_id"`
+	DateOfDispatch     string `json:"date_of_dispatch"`
+}
+
 func ToItemListResponseDTO(items []*data.Item) []ItemResponseDTO {
 	dtoList := make([]ItemResponseDTO, len(items))
 	for i, x := range items {
