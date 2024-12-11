@@ -1011,6 +1011,7 @@ func (t *Item) CreatePS2ExcelItem(ctx context.Context, items []ExcelPS2Item) err
 				}
 			}
 
+			fmt.Println(item.InventoryNumber + " " + strconv.Itoa(articleItem.ID))
 			if articleItem.ID != 0 {
 				_, err := Upper.SQL().Exec(queryForUpdate, articleItem.ID, item.OfficeID)
 				if err != nil {
