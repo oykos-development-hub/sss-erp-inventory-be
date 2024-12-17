@@ -681,6 +681,7 @@ type ItemReportResponse struct {
 	Price                    float64 `json:"price"`
 	Date                     string  `json:"date"`
 	DateOfPurchase           string  `json:"date_of_purchase"`
+	Location                 string  `json:"location"`
 }
 
 func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizationUnitID *int, officeID *int, date *string) ([]ItemReportResponse, error) {
@@ -838,8 +839,9 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows5.Next() {
 			var estimatedDuration int
 			var dateOfAssessment string
-			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
-				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase)
+			err = rows5.Scan(&items[i].ID, &items[i].InventoryNumber, &items[i].ProcurementPrice,
+				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase, &items[i].Location)
+
 			if err != nil {
 				return nil, newErrors.Wrap(err, "upper scan")
 			}
@@ -880,6 +882,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 				items[i].Price = 0
 				items[i].LostValue = items[i].ProcurementPrice
 			}
+
 		}
 	}
 
