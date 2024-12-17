@@ -818,7 +818,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	//makni obavezno office_id - zakucavanje da rade ove popisne liste njihove
 	query5 := `SELECT i.id, i.title, i.inventory_number, a.gross_price_difference,
-		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase
+		 a.estimated_duration, a.date_of_assessment, i.date_of_purchase, i.location
 		FROM items i
 		JOIN assessments a ON i.id = a.inventory_id
 		WHERE (i.id, a.id) IN (
@@ -839,7 +839,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 		for rows5.Next() {
 			var estimatedDuration int
 			var dateOfAssessment string
-			err = rows5.Scan(&items[i].ID, &items[i].InventoryNumber, &items[i].ProcurementPrice,
+			err = rows5.Scan(&items[i].ID, &items[i].Title, &items[i].InventoryNumber, &items[i].ProcurementPrice,
 				&estimatedDuration, &dateOfAssessment, &items[i].DateOfPurchase, &items[i].Location)
 
 			if err != nil {
