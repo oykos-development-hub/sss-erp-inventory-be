@@ -686,7 +686,7 @@ type ItemReportResponse struct {
 
 func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizationUnitID *int, officeID *int, date *string) ([]ItemReportResponse, error) {
 	var items []ItemReportResponse
-	currentTime, err := time.Parse(*date, time.RFC3339Nano)
+	currentTime, err := time.Parse(time.RFC3339Nano, *date)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "time parse")
 	}
