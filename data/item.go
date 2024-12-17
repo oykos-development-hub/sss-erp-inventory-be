@@ -686,7 +686,7 @@ type ItemReportResponse struct {
 
 func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizationUnitID *int, officeID *int, date *string) ([]ItemReportResponse, error) {
 	var items []ItemReportResponse
-	currentTime, err := time.Parse(*date, time.RFC3339)
+	currentTime, err := time.Parse(*date, time.RFC3339Nano)
 	if err != nil {
 		return nil, newErrors.Wrap(err, "time parse")
 	}
@@ -696,7 +696,7 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 	endOfDay := time.Date(year, month, day, 23, 59, 59, 0, loc)
 
-	currDate := endOfDay.Format(time.RFC3339)
+	currDate := endOfDay.Format(time.RFC3339Nano)
 
 	date = &currDate
 
