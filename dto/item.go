@@ -29,8 +29,8 @@ type ItemDTO struct {
 	TargetOrganizationUnitID     *int          `json:"target_organization_unit_id"`
 	Unit                         *string       `json:"unit"`
 	Amount                       int           `json:"amount"`
-	NetPrice                     *float32      `json:"net_price"`
-	GrossPrice                   float32       `json:"gross_price"`
+	NetPrice                     *float64      `json:"net_price"`
+	GrossPrice                   float64       `json:"gross_price"`
 	Description                  *string       `json:"description"`
 	DateOfPurchase               *time.Time    `json:"date_of_purchase"`
 	Inactive                     *time.Time    `json:"inactive"`
@@ -50,7 +50,7 @@ type ItemDTO struct {
 	PriceOfAssessment            *int          `json:"price_of_assessment"`
 	LifetimeOfAssessmentInMonths *int          `json:"lifetime_of_assessment_in_months"`
 	Owner                        *string       `json:"owner"`
-	AssessmentPrice              *float32      `json:"assessment_price"`
+	AssessmentPrice              *float64      `json:"assessment_price"`
 }
 
 type ItemResponseDTO struct {
@@ -77,8 +77,8 @@ type ItemResponseDTO struct {
 	IsExternalDonation           bool       `json:"is_external_donation"`
 	ContractID                   int        `json:"contract_id"`
 	Amount                       int        `json:"amount"`
-	NetPrice                     *float32   `json:"net_price"`
-	GrossPrice                   float32    `json:"gross_price"`
+	NetPrice                     *float64   `json:"net_price"`
+	GrossPrice                   float64    `json:"gross_price"`
 	Description                  *string    `json:"description"`
 	DateOfPurchase               *time.Time `json:"date_of_purchase"`
 	Inactive                     *time.Time `json:"inactive"`
@@ -99,7 +99,7 @@ type ItemResponseDTO struct {
 	FileID                       *int       `json:"file_id"`
 	DeactivationFileID           *int       `json:"deactivation_file_id"`
 	Owner                        *string    `json:"owner"`
-	AssessmentPrice              *float32   `json:"assessment_price"`
+	AssessmentPrice              *float64   `json:"assessment_price"`
 }
 
 func (dto ItemDTO) ToItem() *data.Item {

@@ -13,7 +13,7 @@ type RealEstate struct {
 	ItemID                   int       `db:"item_id"`
 	TypeID                   string    `db:"type_id"`
 	Title                    string    `db:"title"`
-	SquareArea               float32   `db:"square_area"`
+	SquareArea               float64   `db:"square_area"`
 	LandSerialNumber         string    `db:"land_serial_number"`
 	EstateSerialNumber       string    `db:"estate_serial_number"`
 	OwnershipType            string    `db:"ownership_type"`

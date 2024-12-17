@@ -37,8 +37,8 @@ type Item struct {
 	TargetOrganizationUnitID     *int          `db:"target_organization_unit_id"`
 	Unit                         *string       `db:"unit"`
 	Amount                       int           `db:"amount"`
-	NetPrice                     *float32      `db:"net_price"`
-	GrossPrice                   float32       `db:"gross_price"`
+	NetPrice                     *float64      `db:"net_price"`
+	GrossPrice                   float64       `db:"gross_price"`
 	Description                  *string       `db:"description"`
 	DateOfPurchase               *time.Time    `db:"date_of_purchase"`
 	Inactive                     *time.Time    `db:"inactive"`
@@ -676,9 +676,9 @@ type ItemReportResponse struct {
 	OfficeID                 int     `json:"office_id"`
 	SourceOrganizationUnitID int     `json:"source_organization_unit_id"`
 	TargetOrganizationUnitID int     `json:"target_organization_unit_id"`
-	ProcurementPrice         float32 `json:"procurement_price"`
-	LostValue                float32 `json:"lost_value"`
-	Price                    float32 `json:"price"`
+	ProcurementPrice         float64 `json:"procurement_price"`
+	LostValue                float64 `json:"lost_value"`
+	Price                    float64 `json:"price"`
 	Date                     string  `json:"date"`
 	DateOfPurchase           string  `json:"date_of_purchase"`
 }
@@ -862,10 +862,10 @@ func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizatio
 
 			months = years*12 + months
 
-			totalConsumption := float32(0)
-			var percentage float32
+			totalConsumption := float64(0)
+			var percentage float64
 			if estimatedDuration != 0 {
-				percentage = float32(100) / float32(estimatedDuration)
+				percentage = float64(100) / float64(estimatedDuration)
 
 				monthlyConsumption := items[i].ProcurementPrice * percentage / 100 / 12
 				for i := 0; i < months; i++ {

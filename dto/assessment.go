@@ -12,9 +12,9 @@ type AssessmentDTO struct {
 	EstimatedDuration    int        `json:"estimated_duration"`
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
-	GrossPriceNew        float32    `json:"gross_price_new"`
-	GrossPriceDifference float32    `json:"gross_price_difference"`
-	ResidualPrice        *float32   `json:"residual_price"`
+	GrossPriceNew        float64    `json:"gross_price_new"`
+	GrossPriceDifference float64    `json:"gross_price_difference"`
+	ResidualPrice        *float64   `json:"residual_price"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
 	FileID               *int       `json:"file_id,omitempty"`
 	Type                 string     `json:"type"`
@@ -27,9 +27,9 @@ type AssessmentResponseDTO struct {
 	DepreciationTypeID   int        `json:"depreciation_type_id"`
 	UserProfileID        *int       `json:"user_profile_id"`
 	EstimatedDuration    int        `json:"estimated_duration"`
-	GrossPriceNew        float32    `json:"gross_price_new"`
-	GrossPriceDifference float32    `json:"gross_price_difference"`
-	ResidualPrice        *float32   `json:"residual_price"`
+	GrossPriceNew        float64    `json:"gross_price_new"`
+	GrossPriceDifference float64    `json:"gross_price_difference"`
+	ResidualPrice        *float64   `json:"residual_price"`
 	DateOfAssessment     *time.Time `json:"date_of_assessment"`
 	CreatedAt            time.Time  `json:"created_at"`
 	UpdatedAt            time.Time  `json:"updated_at,omitempty"`

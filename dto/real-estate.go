@@ -15,7 +15,7 @@ type RealEstateDTO struct {
 	Title                    string  `json:"title"`
 	ItemID                   int     `json:"item_id" validate:"required"`
 	TypeID                   string  `json:"type_id" validate:"required"`
-	SquareArea               float32 `json:"square_area"`
+	SquareArea               float64 `json:"square_area"`
 	LandSerialNumber         string  `json:"land_serial_number" validate:"required"`
 	EstateSerialNumber       string  `json:"estate_serial_number"`
 	OwnershipType            string  `json:"ownership_type" `
@@ -33,7 +33,7 @@ type RealEstateResponseDTO struct {
 	ItemID                   int       `json:"item_id"`
 	TypeID                   string    `json:"type_id"`
 	Title                    string    `json:"title"`
-	SquareArea               float32   `json:"square_Area"`
+	SquareArea               float64   `json:"square_Area"`
 	LandSerialNumber         string    `json:"land_serial_number"`
 	EstateSerialNumber       string    `json:"estate_serial_number"`
 	OwnershipType            string    `json:"ownership_type"`
