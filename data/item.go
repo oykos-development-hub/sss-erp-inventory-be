@@ -686,6 +686,20 @@ type ItemReportResponse struct {
 
 func (t *Item) GetAllForReport(itemType *string, sourceType *string, organizationUnitID *int, officeID *int, date *string) ([]ItemReportResponse, error) {
 	var items []ItemReportResponse
+	currentTime, err := time.Parse(*date, time.RFC3339)
+	if err != nil {
+		return nil, newErrors.Wrap(err, "time parse")
+	}
+
+	year, month, day := currentTime.Date()
+	loc := currentTime.Location()
+
+	endOfDay := time.Date(year, month, day, 23, 59, 59, 0, loc)
+
+	currDate := endOfDay.Format(time.RFC3339)
+
+	date = &currDate
+
 	//NS1 && PS1 items in moment 'date'
 	query1 := `SELECT i.id, i.type, i.is_external_donation
 	  FROM items i
